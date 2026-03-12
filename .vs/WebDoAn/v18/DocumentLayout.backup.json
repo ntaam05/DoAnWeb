@@ -1,0 +1,471 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Coder\\Web\\WebDoAn\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\roomcomment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\roomcomment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143214_AddIdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebDoAn\\Migrations\\20260312143214_AddIdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\migrations\\20260312143459_initial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\migrations\\20260312143459_initial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\migrations\\20260312144113_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\migrations\\20260312144113_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\webdoan.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\webdoan.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143045_AddIdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebDoAn\\Migrations\\20260312143045_AddIdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\controllers\\roomcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\controllers\\roomcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\views\\room\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\views\\room\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\savedroom.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\savedroom.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\roompost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\roompost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\views\\profile\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\views\\profile\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\roomtenant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\roomtenant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\views\\account\\verifyresetcode.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\views\\account\\verifyresetcode.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\views\\account\\forgotpassword.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\views\\account\\forgotpassword.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\commentvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\commentvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\models\\like.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\models\\like.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|d:\\coder\\web\\webdoan\\webdoan\\views\\room\\manage.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E889C58E-2DBB-4FB9-BAF3-DDF82FBAC239}|WebDoAn\\WebDoAn.csproj|solutionrelative:webdoan\\views\\room\\manage.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "WebDoAn.csproj",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\WebDoAn.csproj",
+              "RelativeDocumentMoniker": "WebDoAn\\WebDoAn.csproj",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\WebDoAn.csproj",
+              "RelativeToolTip": "WebDoAn\\WebDoAn.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-12T14:24:07.268Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "20260312144113_InitialCreate.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312144113_InitialCreate.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Migrations\\20260312144113_InitialCreate.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312144113_InitialCreate.cs",
+              "RelativeToolTip": "WebDoAn\\Migrations\\20260312144113_InitialCreate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:41:14.189Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "20260312143459_Initial.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143459_Initial.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Migrations\\20260312143459_Initial.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143459_Initial.cs",
+              "RelativeToolTip": "WebDoAn\\Migrations\\20260312143459_Initial.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:34:59.356Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "20260312143214_AddIdentity.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143214_AddIdentity.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Migrations\\20260312143214_AddIdentity.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143214_AddIdentity.cs",
+              "RelativeToolTip": "WebDoAn\\Migrations\\20260312143214_AddIdentity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:32:14.182Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d84ee353-0bef-5a41-a649-8f89aca5d84d}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\ApplicationUser.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\ApplicationUser.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\ApplicationUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.53Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "WebDoAn\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.524Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RoomComment.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\RoomComment.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\RoomComment.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\RoomComment.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\RoomComment.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.513Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ScaffoldingReadMe.txt",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\ScaffoldingReadMe.txt",
+              "RelativeDocumentMoniker": "WebDoAn\\ScaffoldingReadMe.txt",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\ScaffoldingReadMe.txt",
+              "RelativeToolTip": "WebDoAn\\ScaffoldingReadMe.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2026-03-12T15:01:56.476Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "20260312143045_AddIdentity.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143045_AddIdentity.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Migrations\\20260312143045_AddIdentity.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Migrations\\20260312143045_AddIdentity.cs",
+              "RelativeToolTip": "WebDoAn\\Migrations\\20260312143045_AddIdentity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:30:46.026Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\appsettings.json",
+              "RelativeDocumentMoniker": "WebDoAn\\appsettings.json",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\appsettings.json",
+              "RelativeToolTip": "WebDoAn\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAACGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-03-12T14:27:55.724Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Detail.cshtml",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Room\\Detail.cshtml",
+              "RelativeDocumentMoniker": "WebDoAn\\Views\\Room\\Detail.cshtml",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Room\\Detail.cshtml",
+              "RelativeToolTip": "WebDoAn\\Views\\Room\\Detail.cshtml",
+              "ViewState": "AgIAAGEAAAAAAAAAAAAAwIMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-12T14:24:07.478Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "SavedRoom.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\SavedRoom.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\SavedRoom.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\SavedRoom.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\SavedRoom.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.476Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "VerifyResetCode.cshtml",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\VerifyResetCode.cshtml",
+              "RelativeDocumentMoniker": "WebDoAn\\Views\\Account\\VerifyResetCode.cshtml",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\VerifyResetCode.cshtml",
+              "RelativeToolTip": "WebDoAn\\Views\\Account\\VerifyResetCode.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-12T14:24:07.502Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "ForgotPassword.cshtml",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\ForgotPassword.cshtml",
+              "RelativeDocumentMoniker": "WebDoAn\\Views\\Account\\ForgotPassword.cshtml",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\ForgotPassword.cshtml",
+              "RelativeToolTip": "WebDoAn\\Views\\Account\\ForgotPassword.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-12T14:24:07.503Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\Login.cshtml",
+              "RelativeDocumentMoniker": "WebDoAn\\Views\\Account\\Login.cshtml",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\Login.cshtml",
+              "RelativeToolTip": "WebDoAn\\Views\\Account\\Login.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-12T14:24:07.505Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "RoomController.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Controllers\\RoomController.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Controllers\\RoomController.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Controllers\\RoomController.cs",
+              "RelativeToolTip": "WebDoAn\\Controllers\\RoomController.cs",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAjwH0AAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.506Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "Manage.cshtml",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Room\\Manage.cshtml",
+              "RelativeDocumentMoniker": "WebDoAn\\Views\\Room\\Manage.cshtml",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Room\\Manage.cshtml",
+              "RelativeToolTip": "WebDoAn\\Views\\Room\\Manage.cshtml",
+              "ViewState": "AgIAAGgAAAAAAAAAAAAiwIsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-12T14:24:07.509Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "RoomTenant.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\RoomTenant.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\RoomTenant.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\RoomTenant.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\RoomTenant.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.51Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "CommentVM.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\CommentVM.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\CommentVM.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\CommentVM.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\CommentVM.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.514Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Edit.cshtml",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Profile\\Edit.cshtml",
+              "RelativeDocumentMoniker": "WebDoAn\\Views\\Profile\\Edit.cshtml",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Profile\\Edit.cshtml",
+              "RelativeToolTip": "WebDoAn\\Views\\Profile\\Edit.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-12T14:24:07.515Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Register.cshtml",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\Register.cshtml",
+              "RelativeDocumentMoniker": "WebDoAn\\Views\\Account\\Register.cshtml",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Views\\Account\\Register.cshtml",
+              "RelativeToolTip": "WebDoAn\\Views\\Account\\Register.cshtml",
+              "ViewState": "AgIAAE0AAAAAAAAAAAAUwIAAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-12T14:24:07.518Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Controllers\\AccountController.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "WebDoAn\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAG8BAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.52Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Controllers\\HomeController.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "WebDoAn\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.522Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Like.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\Like.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\Like.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\Like.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\Like.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.525Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "ErrorViewModel.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\ErrorViewModel.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\ErrorViewModel.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\ErrorViewModel.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\ErrorViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.527Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "RoomPost.cs",
+              "DocumentMoniker": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\RoomPost.cs",
+              "RelativeDocumentMoniker": "WebDoAn\\Models\\RoomPost.cs",
+              "ToolTip": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\Models\\RoomPost.cs",
+              "RelativeToolTip": "WebDoAn\\Models\\RoomPost.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAswCEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T14:24:07.528Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

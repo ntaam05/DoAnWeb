@@ -1,0 +1,52 @@
+﻿@model List<WebDoAn.Models.RoomPost>
+
+@{
+    ViewData["Title"] = "Phòng đã lưu";
+}
+
+<h2 class="mb-4">Phòng đã lưu</h2>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">Bạn chưa lưu phòng nào.</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var room in Model)
+        {
+            var imageUrl = room.ImageUrls?.FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(imageUrl))
+            {
+                imageUrl = "https://picsum.photos/seed/defaultroom/800/500";
+            }
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="@imageUrl"
+                         class="card-img-top"
+                         style="height:220px;object-fit:cover;"
+                         alt="Ảnh phòng"
+                         onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/800/500';" />
+
+                    <div class="card-body">
+                        <h4>@room.Title</h4>
+                        <p class="text-primary fw-bold">@String.Format("{0:N0}", room.Price) đ/tháng</p>
+                    </div>
+
+                    <div class="card-footer bg-white d-flex gap-2">
+                        <a asp-action="Detail" asp-route-id="@room.Id" class="btn btn-outline-primary flex-fill">
+                            Xem chi tiết
+                        </a>
+
+                        <form method="post" asp-action="UnsaveRoom" class="flex-fill">
+                            <input type="hidden" name="roomId" value="@room.Id" />
+                            <button type="submit" class="btn btn-danger w-100">Bỏ lưu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

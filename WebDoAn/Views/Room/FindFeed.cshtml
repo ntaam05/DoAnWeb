@@ -1,0 +1,35 @@
+﻿@model List<WebDoAn.Models.RoomPost>
+@{
+    ViewData["Title"] = "Lướt bài tìm người";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Bài tìm người ở ghép</h2>
+    <a class="btn btn-primary" asp-controller="Room" asp-action="CreateFind">+ Đăng bài</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">Chưa có bài nào.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var p in Model)
+        {
+            <div class="col-12 col-lg-6">
+                <a class="text-decoration-none" asp-controller="Room" asp-action="Detail" asp-route-id="@p.Id">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="fw-semibold text-dark">@p.Title</div>
+                            <div class="text-muted">@p.Description</div>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                            <span class="btn btn-outline-primary w-100">Xem chi tiết</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}

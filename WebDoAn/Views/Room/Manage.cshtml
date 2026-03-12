@@ -1,0 +1,140 @@
+﻿@model WebDoAn.Models.ManageRoomViewModel
+
+@{
+    ViewData["Title"] = "Quản lý phòng";
+}
+
+<h2 class="mb-4">Quản lý phòng: @Model.Room?.Title</h2>
+
+<div class="mb-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="mb-3">Mã tham gia phòng</h5>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <code id="joinCodeBox" style="font-size:16px;">@Model.Room?.JoinCode</code>
+
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btnGenerateCode" data-room-id="@Model.Room?.Id">
+                    Tạo mã
+                </button>
+
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCopyCode">
+                    Copy
+                </button>
+            </div>
+
+            <small class="text-muted d-block mt-2">
+                Mã dạng đẹp: RM{id}-{ownerKey}-{random10}
+            </small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <strong>Thêm người thuê</strong>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-action="AddTenant" enctype="multipart/form-data">
+                    <input type="hidden" name="roomPostId" value="@Model.Room?.Id" />
+
+                    <div class="mb-3">
+                        <label>Họ tên</label>
+                        <input name="name" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input name="email" type="email" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Số điện thoại</label>
+                        <input name="phone" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Avatar</label>
+                        <input name="avatar" type="file" class="form-control" accept="image/*" />
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Thêm người thuê</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <h4 class="mb-3">Danh sách người thuê</h4>
+
+        @if (Model.Tenants == null || !Model.Tenants.Any())
+        {
+            <div class="alert alert-warning">Phòng này hiện chưa có người thuê.</div>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var tenant in Model.Tenants)
+                {
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <img src="@tenant.AvatarUrl"
+                                     style="width:120px;height:120px;object-fit:cover;border-radius:50%;"
+                                     alt="Avatar" />
+
+                                <h5 class="mt-3 mb-1">@tenant.Name</h5>
+                                <div>@tenant.Email</div>
+                                <div>@tenant.Phone</div>
+
+                                <form method="post" asp-action="DeleteTenant" class="mt-3">
+                                    <input type="hidden" name="roomPostId" value="@Model.Room?.Id" />
+                                    <input type="hidden" name="tenantId" value="@tenant.Id" />
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Bạn có chắc muốn xóa người thuê này?')">
+                                        Xóa
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("btnGenerateCode")?.addEventListener("click", async function () {
+            const roomId = this.getAttribute("data-room-id");
+
+            const response = await fetch('/Room/RegenerateJoinCodeAjax', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'roomPostId=' + encodeURIComponent(roomId)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                document.getElementById("joinCodeBox").textContent = data.joinCode;
+            } else {
+                alert(data.message || "Không tạo được mã.");
+            }
+        });
+
+        document.getElementById("btnCopyCode")?.addEventListener("click", async function () {
+            const code = document.getElementById("joinCodeBox")?.textContent?.trim();
+            if (!code) return;
+
+            await navigator.clipboard.writeText(code);
+            alert("Đã copy mã.");
+        });
+    </script>
+}

@@ -1,0 +1,56 @@
+﻿@model List<WebDoAn.Models.RoomPost>
+
+@{
+    ViewData["Title"] = "My Rooms";
+}
+
+<h2 class="mb-4">My Rooms</h2>
+
+<div class="row">
+    @foreach (var room in Model)
+    {
+        var hasTenant = room.Tenants != null && room.Tenants.Any();
+        var imageUrl = room.ImageUrls?.FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            imageUrl = "https://picsum.photos/seed/defaultroom/800/500";
+        }
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="@imageUrl"
+                     class="card-img-top"
+                     style="height:220px;object-fit:cover;"
+                     alt="Ảnh phòng"
+                     onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/800/500';" />
+
+                <div class="card-body">
+                    <h4>@room.Title</h4>
+                    <p class="text-primary fw-bold">@String.Format("{0:N0}", room.Price) đ/tháng</p>
+
+                    @if (hasTenant)
+                    {
+                        <span class="badge bg-success">Đã thuê</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Chưa thuê</span>
+                    }
+                </div>
+
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between mb-2">
+                        <a asp-action="Detail" asp-route-id="@room.Id" class="btn btn-outline-primary">Xem chi tiết</a>
+                        <a asp-action="Manage" asp-route-id="@room.Id" class="btn btn-outline-dark">Quản lý</a>
+                    </div>
+
+                    <form asp-action="DeleteRoom" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa phòng này không?');">
+                        <input type="hidden" name="id" value="@room.Id" />
+                        <button type="submit" class="btn btn-danger w-100">Xóa phòng</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

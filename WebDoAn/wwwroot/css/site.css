@@ -1,0 +1,48 @@
+body {
+    font-family: 'Segoe UI';
+    background: #fafafa;
+    margin: 0;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+    nav a {
+        text-decoration: none;
+        color: black;
+    }
+
+.hero {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.rooms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+    .card img {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+button {
+    padding: 8px 16px;
+    border: 1px solid black;
+    background: white;
+}

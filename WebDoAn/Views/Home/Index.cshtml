@@ -1,0 +1,70 @@
+﻿@model List<WebDoAn.Models.RoomPost>
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<h2 class="mb-4 fw-bold">Phòng mới đăng</h2>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">Chưa có phòng nào.</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var r in Model)
+        {
+            var images = r.ImageUrls ?? new List<string>();
+            var image = images.FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(image))
+            {
+                image = "https://picsum.photos/seed/defaultroom/400/300";
+            }
+
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a class="text-decoration-none" asp-controller="Room" asp-action="Detail" asp-route-id="@r.Id">
+                    <div class="card h-100 shadow-sm room-card border-0">
+                        <div class="position-relative">
+                            <img src="@image"
+                                 class="card-img-top"
+                                 style="height:200px;object-fit:cover"
+                                 alt="Ảnh phòng"
+                                 onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/400/300';" />
+
+                            <span class="badge bg-@(r.PostType == "Room" ? "primary" : "success") position-absolute top-0 start-0 m-2">
+                                @(r.PostType == "Room" ? "Cho thuê" : "Ở ghép")
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title text-dark fw-semibold">@r.Title</h5>
+
+                            <div class="fw-bold text-danger fs-5">
+                                @String.Format("{0:N0} đ/tháng", r.Price)
+                            </div>
+
+                            <p class="text-muted text-truncate">@r.Description</p>
+                        </div>
+
+                        <div class="card-footer bg-white border-0">
+                            <div class="btn btn-outline-primary w-100">Xem chi tiết</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .room-card {
+        transition: all .2s ease;
+        border-radius: 15px;
+    }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 2rem rgba(0,0,0,.15) !important;
+        }
+</style>

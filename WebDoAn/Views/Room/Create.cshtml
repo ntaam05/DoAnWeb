@@ -1,0 +1,64 @@
+﻿@model WebDoAn.Models.RoomPost
+@{
+    ViewData["Title"] = "Đăng phòng";
+}
+
+<h2 class="mb-3">Đăng Phòng (Người Cho Thuê)</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="w-75">
+    <div class="mb-3">
+        <label class="form-label">Tiêu đề</label>
+        <input asp-for="Title" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giá (VNĐ)</label>
+        <input asp-for="Price" type="number" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Ảnh phòng</label>
+        <input type="file" id="imageInput" name="images" multiple accept="image/*" class="form-control" />
+        <div class="form-text">Có thể chọn nhiều ảnh cùng lúc.</div>
+    </div>
+
+    <div id="preview" class="row mt-3"></div>
+
+    <div class="mb-3">
+        <label class="form-label">Mô tả</label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Đăng</button>
+</form>
+
+<script>
+    const input = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+
+    input.addEventListener("change", function (event) {
+        preview.innerHTML = "";
+        const files = Array.from(event.target.files);
+
+        files.forEach(file => {
+            if (!file.type.startsWith("image/")) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const col = document.createElement("div");
+                col.className = "col-md-3 mb-3";
+
+                col.innerHTML = `
+                    <div class="border rounded p-2">
+                        <img src="${e.target.result}" class="img-fluid rounded" style="height:150px; width:100%; object-fit:cover;" alt="preview">
+                        <div class="small text-muted mt-2 text-truncate">${file.name}</div>
+                    </div>
+                `;
+
+                preview.appendChild(col);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+</script>

@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Nhập mã xác nhận";
+}
+
+<h2 class="mb-3">Nhập mã xác nhận</h2>
+
+<div class="w-50">
+    <p>Email: <strong>@ViewBag.Email</strong></p>
+
+    <form method="post">
+        <div class="mb-3">
+            <label>Mã 6 chữ số</label>
+            <input name="code"
+                   class="form-control"
+                   maxlength="6"
+                   minlength="6"
+                   pattern="[0-9]{6}"
+                   inputmode="numeric"
+                   placeholder="Nhập mã xác nhận"
+                   required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Xác nhận mã</button>
+    </form>
+</div>  

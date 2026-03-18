@@ -15,6 +15,13 @@ namespace WebDoAn.Areas.Identity.Pages.Account
 {
     public class LogoutModel : PageModel
     {
+        private const string CURRENT_EMAIL = "CURRENT_USER_EMAIL";
+        private const string CURRENT_TYPE = "CURRENT_USER_TYPE";
+        private const string RESET_EMAIL_KEY = "RESET_EMAIL";
+        private const string RESET_CODE_KEY = "RESET_CODE";
+        private const string RESET_EXPIRE_KEY = "RESET_EXPIRE";
+        private const string RESET_VERIFIED_KEY = "RESET_VERIFIED";
+
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
 
@@ -24,10 +31,29 @@ namespace WebDoAn.Areas.Identity.Pages.Account
             _logger = logger;
         }
 
+        public IActionResult OnGet()
+        {
+            HttpContext.Session.Remove(CURRENT_EMAIL);
+            HttpContext.Session.Remove(CURRENT_TYPE);
+            HttpContext.Session.Remove(RESET_EMAIL_KEY);
+            HttpContext.Session.Remove(RESET_CODE_KEY);
+            HttpContext.Session.Remove(RESET_EXPIRE_KEY);
+            HttpContext.Session.Remove(RESET_VERIFIED_KEY);
+
+            return RedirectToPage("/Index", new { area = "" });
+        }
+
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+            HttpContext.Session.Remove(CURRENT_EMAIL);
+            HttpContext.Session.Remove(CURRENT_TYPE);
+            HttpContext.Session.Remove(RESET_EMAIL_KEY);
+            HttpContext.Session.Remove(RESET_CODE_KEY);
+            HttpContext.Session.Remove(RESET_EXPIRE_KEY);
+            HttpContext.Session.Remove(RESET_VERIFIED_KEY);
+
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);

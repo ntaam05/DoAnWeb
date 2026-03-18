@@ -4,82 +4,127 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
-using WebDoAn.Models;
+using WebDoAn.Data;
 
 namespace WebDoAn.Areas.Identity.Pages.Account
 {
     public class ForgotPasswordModel : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        private const string RESET_EMAIL_KEY = "RESET_EMAIL";
+        private const string RESET_CODE_KEY = "RESET_CODE";
+        private const string RESET_EXPIRE_KEY = "RESET_EXPIRE";
+        private const string RESET_VERIFIED_KEY = "RESET_VERIFIED";
+
+        public ForgotPasswordModel(ApplicationDbContext context)
         {
-            _userManager = userManager;
-            _emailSender = emailSender;
+            _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        [TempData]
+        public string StatusMessage { get; set; }
+
+        public string EmailChecked { get; set; }
+        public bool EmailExists { get; set; }
+
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Vui lòng nhập email")]
+            [EmailAddress(ErrorMessage = "Email không hợp lệ")]
             public string Email { get; set; }
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public void OnGet()
+        {
+        }
+
+        public IActionResult OnPost()
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                var email = Input.Email.Trim().ToLowerInvariant();
+                var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
+
+                EmailChecked = email;
+                EmailExists = user != null;
+
+                if (!EmailExists)
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToPage("./ForgotPasswordConfirmation");
+                    StatusMessage = "Email này chưa được đăng ký.";
                 }
 
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                var callbackUrl = Url.Page(
-                    "/Account/ResetPassword",
-                    pageHandler: null,
-                    values: new { area = "Identity", code },
-                    protocol: Request.Scheme);
-
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                return RedirectToPage("./ForgotPasswordConfirmation");
+                return Page();
             }
 
             return Page();
+        }
+
+        public IActionResult OnPostSendCode(string email)
+        {
+            email = (email ?? "").Trim().ToLowerInvariant();
+
+            var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
+            if (user == null)
+            {
+                StatusMessage = "Email này chưa được đăng ký.";
+                return RedirectToPage();
+            }
+
+            var code = Generate6DigitCode();
+
+            HttpContext.Session.SetString(RESET_EMAIL_KEY, email);
+            HttpContext.Session.SetString(RESET_CODE_KEY, code);
+            HttpContext.Session.SetString(RESET_EXPIRE_KEY, DateTime.UtcNow.AddMinutes(5).ToString("O"));
+            HttpContext.Session.Remove(RESET_VERIFIED_KEY);
+
+            try
+            {
+                SendResetMail(email, code);
+                StatusMessage = "Đã gửi mã xác nhận đến email của bạn.";
+                return RedirectToPage("VerifyResetCode");
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "Gửi email thất bại: " + ex.Message;
+                return RedirectToPage();
+            }
+        }
+
+        private string Generate6DigitCode()
+        {
+            var random = new Random();
+            var chars = new char[6];
+            for (int i = 0; i < 6; i++)
+            {
+                chars[i] = (char)('0' + random.Next(10));
+            }
+            return new string(chars);
+        }
+
+        private void SendResetMail(string toEmail, string code)
+        {
+            var fromEmail = "turtle2773@gmail.com";
+            var appPassword = "lqcpynxdxsrclynq";
+
+            var message = new MailMessage();
+            message.From = new MailAddress(fromEmail, "WebDoAn");
+            message.To.Add(toEmail);
+            message.Subject = "Mã đặt lại mật khẩu";
+            message.Body = $"Mã xác nhận đặt lại mật khẩu của bạn là: {code}\nMã có hiệu lực trong 5 phút.";
+
+            using var smtp = new SmtpClient("smtp.gmail.com", 587);
+            smtp.Credentials = new NetworkCredential(fromEmail, appPassword);
+            smtp.EnableSsl = true;
+            smtp.Send(message);
         }
     }
 }

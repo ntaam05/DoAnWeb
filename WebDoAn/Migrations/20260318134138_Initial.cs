@@ -12,6 +12,21 @@ namespace WebDoAn.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "AdminRoles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AssignedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdminRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -99,7 +114,9 @@ namespace WebDoAn.Migrations
                     BirthYear = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Hometown = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsBanned = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -308,6 +325,9 @@ namespace WebDoAn.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AdminRoles");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 

@@ -15,4 +15,6 @@ public class UserAccount
     public string Gender { get; set; } = "";
     public string Hometown { get; set; } = "";
     public string AvatarUrl { get; set; } = "";
+    public bool IsBanned { get; set; } = false;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

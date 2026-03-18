@@ -62,6 +62,7 @@ wwwroot\uploads\avatars\41aaa8113ef849bdb2830e71c9b61d37.jpg
 wwwroot\uploads\avatars\919e4d5b35114b10912eb21f36b4f18d.jpg
 wwwroot\uploads\avatars\ad35daa4a04f4a609268b4c83e8edc39.jpg
 wwwroot\uploads\avatars\ec8ab8999af14982a80306cf6ed957e1.jpg
+wwwroot\uploads\avatars\nhanquadepzai@gmail.com_1521__le_vu_thien_nhan.jpg
 wwwroot\uploads\rooms\014e33c2ddeb49daa5080baf55ab9a10.jpg
 wwwroot\uploads\rooms\2254acbef45a4a3d87a7a79fa0a317b8.png
 wwwroot\uploads\rooms\81890706114c4d6cb94af9c5bb3114e8.jpg
@@ -69,6 +70,8 @@ wwwroot\uploads\rooms\b73653abf9c14aabbd389293f74b104f.jpg
 wwwroot\uploads\rooms\c0d4d95860a94006a3f151e371d9fddd.jpg
 wwwroot\uploads\rooms\c3946eb52a5a4ff6bc08646b094cb694.jpg
 wwwroot\uploads\rooms\e556e4e81cbe43b3ae736f03c8112514.jpg
+wwwroot\uploads\rooms\room_nhanbesthihi36_at_gmail.com_1_1_a5d8906d43bb4377b75fee2e00873f41.jpg
+wwwroot\uploads\rooms\room_nhanbesthihi36_at_gmail.com_blah_1_584fbf692e0043e09c8f9ecad355837d.jpg
 wwwroot\uploads\rooms\room_nhanbesthihi@gmail.com_111_1.jpg
 wwwroot\uploads\rooms\room_nhanbesthihi_at_gmail.com_1111_1_7e1fd90fe3834f93b2fb2da45eddab80.jpg
 wwwroot\uploads\rooms\room_nhanbesthihi_at_gmail.com_1111_2_b217faf8310a4e3e992a52bbeb6d5210.jpg

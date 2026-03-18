@@ -1,0 +1,79 @@
+﻿@model IEnumerable<WebDoAn.Models.RoomPost>
+
+@{
+    ViewData["Title"] = "Quản lý bài đăng phòng";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Quản lý bài đăng phòng</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tiêu đề</th>
+                        <th>Giá</th>
+                        <th>Chủ bài</th>
+                        <th>Đã thuê</th>
+                        <th>Mã tham gia</th>
+                        <th width="220">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.Title</td>
+                            <td>@item.Price.ToString("N0") VNĐ</td>
+                            <td>@item.OwnerId</td>
+                            <td>
+                                @if (item.IsRented)
+                                {
+                                    <span class="badge bg-success">Đã thuê</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Chưa thuê</span>
+                                }
+                            </td>
+                            <td>@item.JoinCode</td>
+                            <td>
+                                <a asp-action="ViewRoomDetails" asp-route-postId="@item.Id" class="btn btn-sm btn-info text-white">
+                                    Xem
+                                </a>
+
+                                <form asp-action="DeleteRoomPost" method="post" class="d-inline">
+                                    <input type="hidden" name="postId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Bạn có chắc muốn xóa bài đăng này?')">
+                                        Xóa
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Chưa có bài đăng phòng nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

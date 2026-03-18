@@ -12,8 +12,8 @@ using WebDoAn.Data;
 namespace WebDoAn.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260312144113_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260318134138_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,6 +160,29 @@ namespace WebDoAn.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("WebDoAn.Models.AdminRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AssignedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminRoles");
                 });
 
             modelBuilder.Entity("WebDoAn.Models.ApplicationUser", b =>
@@ -373,6 +396,9 @@ namespace WebDoAn.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -384,6 +410,9 @@ namespace WebDoAn.Migrations
                     b.Property<string>("Hometown")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsBanned")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Password")
                         .IsRequired()

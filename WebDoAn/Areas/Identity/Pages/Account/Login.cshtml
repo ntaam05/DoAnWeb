@@ -1,66 +1,63 @@
 ﻿@page
 @model LoginModel
 @{
-    ViewData["Title"] = "Đăng Nhập";
+    ViewData["Title"] = "Đăng nhập";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2 class="mb-4">Đăng Nhập</h2>
-
-        <form method="post">
-            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
-
-            <div class="mb-3">
-                <label asp-for="Input.Email" class="form-label">Email</label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.Password" class="form-label">Mật khẩu</label>
-                <div class="input-group">
-                    <input asp-for="Input.Password" class="form-control" id="passwordInput" />
-                    <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn">
-                        <i class="bi bi-eye" id="toggleIcon">👁️</i>
-                    </button>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header text-center py-4 border-0" style="background-color: var(--primary-teal); color: white;">
+                    <h3 class="fw-bold mb-0"><i class="bi bi-box-arrow-in-right"></i> Chào mừng trở lại!</h3>
+                    <p class="mb-0 mt-1 small text-white-50">Vui lòng đăng nhập để tiếp tục</p>
                 </div>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form id="account" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control focus-teal" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email" class="text-muted"><i class="bi bi-envelope"></i> Địa chỉ Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="Input.Password" class="form-control focus-teal" autocomplete="current-password" aria-required="true" placeholder="password" />
+                            <label asp-for="Input.Password" class="text-muted"><i class="bi bi-shield-lock"></i> Mật khẩu</label>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4 small">
+                            <div class="form-check">
+                                <input class="form-check-input focus-teal" asp-for="Input.RememberMe" />
+                                <label class="form-check-label text-muted" asp-for="Input.RememberMe">Nhớ tài khoản</label>
+                            </div>
+                            <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none fw-bold" style="color: var(--primary-teal);">Quên mật khẩu?</a>
+                        </div>
+
+                        <button id="login-submit" type="submit" class="btn text-white w-100 py-3 fw-bold rounded-pill shadow-sm hover-teal-dark" style="background-color: var(--primary-teal);">
+                            ĐĂNG NHẬP
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <span class="text-muted small">Chưa có tài khoản? </span>
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-bold" style="color: var(--primary-teal);">Đăng ký ngay</a>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-3 form-check">
-                <input asp-for="Input.RememberMe" class="form-check-input" />
-                <label asp-for="Input.RememberMe" class="form-check-label">Nhớ tôi</label>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Đăng Nhập</button>
-            <a asp-page="./ForgotPassword" class="btn btn-link d-block text-center mt-2">Quên mật khẩu?</a>
-        </form>
-
-        <hr />
-        <p class="text-center">
-            Chưa có tài khoản? <a asp-page="./Register">Đăng ký ngay</a>
-        </p>
+        </div>
     </div>
 </div>
 
-@section Scripts {
-    @{ 
-        await Html.RenderPartialAsync("_ValidationScriptsPartial"); 
+<style>
+    .focus-teal:focus {
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
     }
-    <script>
-        // Toggle ẩn/hiện mật khẩu
-        document.getElementById('togglePasswordBtn').addEventListener('click', function () {
-            const passwordInput = document.getElementById('passwordInput');
-            const toggleIcon = document.getElementById('toggleIcon');
 
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.textContent = '👁️';
-            }
-        });
-    </script>
-}
+    .hover-teal-dark:hover {
+        background-color: var(--primary-teal-hover) !important;
+    }
+</style>

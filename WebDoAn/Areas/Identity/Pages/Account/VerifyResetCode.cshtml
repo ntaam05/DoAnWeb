@@ -1,0 +1,43 @@
+﻿@page
+@model VerifyResetCodeModel
+@{
+    ViewData["Title"] = "Xác nhận mã";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="mb-4">Xác Nhận Mã</h2>
+
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            <div class="alert alert-info">@Model.StatusMessage</div>
+        }
+
+        <form method="post">
+            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label class="form-label">Email: @Model.Email</label>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Code" class="form-label">Mã xác nhận (6 chữ số)</label>
+                <input asp-for="Input.Code" class="form-control" placeholder="Nhập mã gồm 6 chữ số" />
+                <span asp-validation-for="Input.Code" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Xác nhận</button>
+        </form>
+
+        <hr />
+        <p>
+            <a asp-page="./ForgotPassword">Quay lại</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

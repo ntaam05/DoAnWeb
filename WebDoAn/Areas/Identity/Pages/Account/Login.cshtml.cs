@@ -7,13 +7,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using WebDoAn.Data;
 using WebDoAn.Models;
 
 namespace WebDoAn.Areas.Identity.Pages.Account
@@ -22,66 +22,37 @@ namespace WebDoAn.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly ApplicationDbContext _context;
+        private const string REMEMBER_ME_EMAIL = "REMEMBER_ME_EMAIL";
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, ApplicationDbContext context)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string ErrorMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Vui lòng nhập email")]
+            [EmailAddress(ErrorMessage = "Email không hợp lệ")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Display(Name = "Remember me?")]
+            [Display(Name = "Nhớ tôi")]
             public bool RememberMe { get; set; }
         }
 
@@ -93,48 +64,60 @@ namespace WebDoAn.Areas.Identity.Pages.Account
             }
 
             returnUrl ??= Url.Content("~/");
-
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
             ReturnUrl = returnUrl;
+
+            // Load saved email from cookie
+            var savedEmail = HttpContext.Request.Cookies[REMEMBER_ME_EMAIL];
+            if (!string.IsNullOrEmpty(savedEmail))
+            {
+                Input = new InputModel { Email = savedEmail, RememberMe = true };
+            }
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                var email = Input.Email.Trim().ToLowerInvariant();
+                var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
+
+                if (user == null)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    ModelState.AddModelError(string.Empty, "Tài khoản chưa tồn tại. Vui lòng đăng ký.");
+                    return Page();
                 }
-                if (result.RequiresTwoFactor)
+
+                if (user.Password != Input.Password)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    ModelState.AddModelError(string.Empty, "Sai mật khẩu.");
+                    return Page();
                 }
-                if (result.IsLockedOut)
+
+                HttpContext.Session.SetString("CURRENT_USER_EMAIL", user.Email);
+                HttpContext.Session.SetString("CURRENT_USER_TYPE", user.UserType);
+
+                // Save email cookie if Remember Me checked
+                if (Input.RememberMe)
                 {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
+                    HttpContext.Response.Cookies.Append(REMEMBER_ME_EMAIL, email, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Expires = DateTimeOffset.UtcNow.AddDays(30)
+                    });
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
+                    HttpContext.Response.Cookies.Delete(REMEMBER_ME_EMAIL);
                 }
+
+                return LocalRedirect(returnUrl);
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
     }

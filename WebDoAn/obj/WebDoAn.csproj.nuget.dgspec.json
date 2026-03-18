@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\WebDoAn.csproj": {}
+    "C:\\Users\\Administrator\\Source\\Repos\\DoAnWeb\\WebDoAn\\WebDoAn.csproj": {}
   },
   "projects": {
-    "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\WebDoAn.csproj": {
+    "C:\\Users\\Administrator\\Source\\Repos\\DoAnWeb\\WebDoAn\\WebDoAn.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\WebDoAn.csproj",
+        "projectUniqueName": "C:\\Users\\Administrator\\Source\\Repos\\DoAnWeb\\WebDoAn\\WebDoAn.csproj",
         "projectName": "WebDoAn",
-        "projectPath": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\WebDoAn.csproj",
-        "packagesPath": "C:\\Users\\Hoang Nhat Tam\\.nuget\\packages\\",
-        "outputPath": "D:\\Coder\\Web\\WebDoAn\\WebDoAn\\obj\\",
+        "projectPath": "C:\\Users\\Administrator\\Source\\Repos\\DoAnWeb\\WebDoAn\\WebDoAn.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Administrator\\Source\\Repos\\DoAnWeb\\WebDoAn\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "D:\\Visual Studio Comunity\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Hoang Nhat Tam\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -94,24 +94,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.23, 8.0.23]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.23, 8.0.23]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.23, 8.0.23]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.23, 8.0.23]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -120,7 +102,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

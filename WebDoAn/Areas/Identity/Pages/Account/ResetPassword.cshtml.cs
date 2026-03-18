@@ -4,115 +4,102 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
-using WebDoAn.Models;
+using WebDoAn.Data;
 
 namespace WebDoAn.Areas.Identity.Pages.Account
 {
     public class ResetPasswordModel : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
 
-        public ResetPasswordModel(UserManager<ApplicationUser> userManager)
+        private const string RESET_EMAIL_KEY = "RESET_EMAIL";
+        private const string RESET_VERIFIED_KEY = "RESET_VERIFIED";
+
+        public ResetPasswordModel(ApplicationDbContext context)
         {
-            _userManager = userManager;
+            _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        [TempData]
+        public string StatusMessage { get; set; }
+
+        public string Email { get; set; }
+
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
+            [StringLength(100, ErrorMessage = "Mật khẩu phải dài từ {2} đến {1} ký tự.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            public string Password { get; set; }
+            public string NewPassword { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Xác nhận mật khẩu")]
+            [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp")]
             public string ConfirmPassword { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            public string Code { get; set; }
-
         }
 
-        public IActionResult OnGet(string code = null)
+        public IActionResult OnGet()
         {
-            if (code == null)
-            {
-                return BadRequest("A code must be supplied for password reset.");
-            }
-            else
-            {
-                Input = new InputModel
-                {
-                    Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
-                };
-                return Page();
-            }
-        }
+            var email = HttpContext.Session.GetString(RESET_EMAIL_KEY);
+            var verified = HttpContext.Session.GetString(RESET_VERIFIED_KEY);
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrEmpty(email) || verified != "true")
             {
-                return Page();
+                StatusMessage = "Vui lòng lấy mã và xác thực lại.";
+                return RedirectToPage("ForgotPassword");
             }
 
-            var user = await _userManager.FindByEmailAsync(Input.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
-
-            var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
+            Email = email;
             return Page();
+        }
+
+        public IActionResult OnPost()
+        {
+            var email = HttpContext.Session.GetString(RESET_EMAIL_KEY);
+            var verified = HttpContext.Session.GetString(RESET_VERIFIED_KEY);
+
+            Email = email;
+
+            if (string.IsNullOrEmpty(email) || verified != "true")
+            {
+                StatusMessage = "Phiên đặt lại mật khẩu không hợp lệ.";
+                return RedirectToPage("ForgotPassword");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
+                if (user == null)
+                {
+                    ClearResetSession();
+                    StatusMessage = "Tài khoản không tồn tại.";
+                    return RedirectToPage("ForgotPassword");
+                }
+
+                user.Password = Input.NewPassword;
+                _context.SaveChanges();
+
+                ClearResetSession();
+
+                StatusMessage = "Đổi mật khẩu thành công. Vui lòng đăng nhập lại.";
+                return RedirectToPage("Login");
+            }
+
+            return Page();
+        }
+
+        private void ClearResetSession()
+        {
+            HttpContext.Session.Remove(RESET_EMAIL_KEY);
+            HttpContext.Session.Remove(RESET_VERIFIED_KEY);
+            HttpContext.Session.Remove("RESET_CODE");
+            HttpContext.Session.Remove("RESET_EXPIRE");
         }
     }
 }

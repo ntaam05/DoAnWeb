@@ -1,1 +1,104 @@
-﻿<h1>Chào mừng Sếp (Admin) đã đến với trang Quản trị!</h1>
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    .stat-card {
+        background: linear-gradient(135deg, #009688 0%, #00796b 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 150, 136, 0.2);
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    .stat-label {
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <h1 class="mb-4"><i class="bi bi-gear"></i> Admin Dashboard</h1>
+
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="stat-card">
+                <div class="stat-number">@ViewBag.Stats.TotalUsers</div>
+                <div class="stat-label">Tổng người dùng</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="stat-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);">
+                <div class="stat-number">@ViewBag.Stats.TotalAdmins</div>
+                <div class="stat-label">Admin</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="stat-card" style="background: linear-gradient(135deg, #4ecdc4 0%, #44a78d 100%);">
+                <div class="stat-number">@ViewBag.Stats.TotalRoomPosts</div>
+                <div class="stat-label">Bài đăng phòng</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="stat-card" style="background: linear-gradient(135deg, #ffe66d 0%, #ffb84d 100%); color: #333;">
+                <div class="stat-number">@ViewBag.Stats.TotalFindPosts</div>
+                <div class="stat-label">Bài tìm người</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-lock fs-1" style="color: #009688;"></i>
+                    <h5 class="mt-3 mb-2">Quản lý Admin</h5>
+                    <a href="@Url.Action("ManageAdmins")" class="btn btn-sm btn-outline-primary">Quản lý</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-people fs-1" style="color: #ff6b6b;"></i>
+                    <h5 class="mt-3 mb-2">Quản lý người dùng</h5>
+                    <a href="@Url.Action("ManageUsers")" class="btn btn-sm btn-outline-danger">Quản lý</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-building fs-1" style="color: #4ecdc4;"></i>
+                    <h5 class="mt-3 mb-2">Bài đăng phòng</h5>
+                    <a href="@Url.Action("ManageRoomPosts")" class="btn btn-sm btn-outline-info">Quản lý</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-search fs-1" style="color: #ffe66d;"></i>
+                    <h5 class="mt-3 mb-2">Bài tìm người</h5>
+                    <a href="@Url.Action("ManageFindPosts")" class="btn btn-sm btn-outline-warning">Quản lý</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        box-shadow: 0 10px 25px rgba(0, 150, 136, 0.15) !important;
+        transform: translateY(-5px);
+    }
+</style>

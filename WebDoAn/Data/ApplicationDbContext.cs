@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<RoomTenant> RoomTenants { get; set; } = default!;
     public DbSet<UserAccount> UserAccounts { get; set; } = default!;
     public DbSet<SavedRoom> SavedRooms { get; set; } = default!;
+    public DbSet<AdminRole> AdminRoles { get; set; } = default!; // <--- Thêm dòng này
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

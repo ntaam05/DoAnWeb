@@ -1,0 +1,74 @@
+﻿@model List<WebDoAn.Models.AdminRole>
+@{
+    ViewData["Title"] = "Quản lý Admin";
+}
+
+<div class="container-fluid py-4">
+    <h2 class="mb-4"><i class="bi bi-shield-lock"></i> Quản lý Admin</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thêm Admin mới</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="AddAdmin">
+                        <div class="mb-3">
+                            <label class="form-label">Email người dùng</label>
+                            <input type="email" name="email" class="form-control" required placeholder="Nhập email" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Cấp quyền Admin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Email</th>
+                        <th>Cấp quyền bởi</th>
+                        <th>Ngày cấp</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var admin in Model)
+                    {
+                        <tr>
+                            <td><strong>@admin.Email</strong></td>
+                            <td>@admin.AssignedBy</td>
+                            <td>@admin.AssignedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <form method="post" asp-action="RemoveAdmin" style="display:inline;" onsubmit="return confirm('Xóa quyền Admin?');">
+                                    <input type="hidden" name="adminId" value="@admin.Id" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Xóa quyền</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

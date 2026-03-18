@@ -3,68 +3,178 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<h2 class="mb-4 fw-bold">Phòng mới đăng</h2>
-
-@if (Model == null || Model.Count == 0)
-{
-    <div class="alert alert-info">Chưa có phòng nào.</div>
-}
-else
-{
-    <div class="row g-4">
-        @foreach (var r in Model)
-        {
-            var images = r.ImageUrls ?? new List<string>();
-            var image = images.FirstOrDefault();
-
-            if (string.IsNullOrWhiteSpace(image))
-            {
-                image = "https://picsum.photos/seed/defaultroom/400/300";
-            }
-
-            <div class="col-12 col-sm-6 col-lg-4">
-                <a class="text-decoration-none" asp-controller="Room" asp-action="Detail" asp-route-id="@r.Id">
-                    <div class="card h-100 shadow-sm room-card border-0">
-                        <div class="position-relative">
-                            <img src="@image"
-                                 class="card-img-top"
-                                 style="height:200px;object-fit:cover"
-                                 alt="Ảnh phòng"
-                                 onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/400/300';" />
-
-                            <span class="badge bg-@(r.PostType == "Room" ? "primary" : "success") position-absolute top-0 start-0 m-2">
-                                @(r.PostType == "Room" ? "Cho thuê" : "Ở ghép")
-                            </span>
-                        </div>
-
-                        <div class="card-body">
-                            <h5 class="card-title text-dark fw-semibold">@r.Title</h5>
-
-                            <div class="fw-bold text-danger fs-5">
-                                @String.Format("{0:N0} đ/tháng", r.Price)
-                            </div>
-
-                            <p class="text-muted text-truncate">@r.Description</p>
-                        </div>
-
-                        <div class="card-footer bg-white border-0">
-                            <div class="btn btn-outline-primary w-100">Xem chi tiết</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        }
-    </div>
-}
-
 <style>
+    /* CSS cho các thành phần riêng của trang chủ */
+    .hero-section {
+        background: linear-gradient(rgba(0, 150, 136, 0.7), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070') no-repeat center center;
+        background-size: cover;
+        height: 60vh;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .search-box {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-top: -60px;
+        position: relative;
+        z-index: 10;
+    }
+
     .room-card {
-        transition: all .2s ease;
-        border-radius: 15px;
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05) !important;
     }
 
         .room-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 1rem 2rem rgba(0,0,0,.15) !important;
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,150,136,0.15) !important;
         }
+
+    .price-tag {
+        color: #e53935;
+        font-weight: 800;
+        font-size: 1.3rem;
+    }
 </style>
+
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bolder mb-3">Tìm Phòng Trọ Tuyệt Vời</h1>
+        <p class="lead fw-normal mb-5">Hàng ngàn phòng trọ tiện nghi và bạn cùng tiến đang chờ đón</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="search-box">
+        <form action="/Room/Search" method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label text-muted small fw-bold"><i class="bi bi-geo-alt"></i> Khu vực</label>
+                <select class="form-select border-0 border-bottom rounded-0 shadow-none" name="location">
+                    <option selected>Tất cả khu vực</option>
+                    <option value="1">Quận 1</option>
+                    <option value="2">Quận 7</option>
+                    <option value="3">Thủ Đức</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small fw-bold"><i class="bi bi-cash"></i> Mức giá</label>
+                <select class="form-select border-0 border-bottom rounded-0 shadow-none" name="priceRange">
+                    <option selected>Tất cả mức giá</option>
+                    <option value="1">Dưới 2 triệu</option>
+                    <option value="2">2 - 4 triệu</option>
+                    <option value="3">Trên 4 triệu</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold"><i class="bi bi-search"></i> Từ khóa</label>
+                <input type="text" class="form-control border-0 border-bottom rounded-0 shadow-none" placeholder="Nhập tên đường, đại học..." name="keyword">
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn text-white py-2 fw-bold" style="background-color: var(--primary-teal);">Tìm ngay</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container mt-5 pt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-uppercase fs-4 border-start border-4 border-info ps-3">Phòng Mới Đăng</h2>
+        <a href="/Room/All" class="text-decoration-none fw-bold" style="color: var(--primary-teal);">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-info border-0 shadow-sm text-center py-5">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+            Chưa có bài đăng phòng nào trong hệ thống.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var r in Model)
+            {
+                var images = r.ImageUrls ?? new List<string>();
+                var image = images.FirstOrDefault();
+
+                if (string.IsNullOrWhiteSpace(image))
+                {
+                    image = "https://picsum.photos/seed/defaultroom/400/300";
+                }
+
+                <div class="col">
+                    <a class="text-decoration-none" asp-controller="Room" asp-action="Detail" asp-route-id="@r.Id">
+                        <div class="card h-100 room-card shadow-sm border-0">
+                            <div class="position-relative">
+                                <img src="@image" class="card-img-top w-100" style="height:220px; object-fit:cover" alt="Ảnh phòng" onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/400/300';" />
+
+                                <span class="badge @(r.PostType == "Room" ? "bg-warning text-dark" : "bg-success") position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow">
+                                    <i class="bi @(r.PostType == "Room" ? "bi-house-door" : "bi-people")"></i>
+                                    @(r.PostType == "Room" ? "Cho thuê" : "Tìm ở ghép")
+                                </span>
+                            </div>
+
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-dark fw-bold text-truncate mb-3" title="@r.Title">@r.Title</h5>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="price-tag">
+                                        @String.Format("{0:N0} đ", r.Price) <span class="fs-6 text-muted fw-normal">/tháng</span>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted text-truncate mb-0" style="font-size: 0.95rem;">@r.Description</p>
+                            </div>
+
+                            <div class="card-footer bg-white border-0 p-3 pt-0">
+                                <hr class="border-light mt-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted"><i class="bi bi-clock-history"></i> Mới cập nhật</small>
+                                    <span class="btn btn-sm text-white px-3 rounded-pill" style="background-color: var(--primary-teal);">Xem chi tiết</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div class="container-fluid bg-light py-5 mt-5">
+    <div class="container">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-6">
+                <span class="badge text-dark bg-warning px-3 py-2 rounded-pill mb-3">Lợi ích vượt trội</span>
+                <h3 class="fw-bold mb-4 display-6">Tìm kiếm dễ dàng, kết nối dài lâu</h3>
+                <p class="text-muted fs-5 mb-4">Giao diện thân thiện giúp bạn tiếp cận nhanh chóng các lựa chọn tối ưu nhất dựa trên nhu cầu, từ mức giá đến vị trí.</p>
+
+                <div class="row g-4 mt-2">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 bg-white p-3 rounded shadow-sm border border-light">
+                            <i class="bi bi-shield-check fs-1" style="color: var(--primary-teal);"></i>
+                            <span class="fw-bold">Tin đăng<br>chính chủ</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 bg-white p-3 rounded shadow-sm border border-light">
+                            <i class="bi bi-sliders fs-1" style="color: var(--primary-teal);"></i>
+                            <span class="fw-bold">Bộ lọc<br>thông minh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=800" class="img-fluid rounded-4 shadow-lg" alt="Phòng đẹp">
+            </div>
+        </div>
+    </div>
+</div>

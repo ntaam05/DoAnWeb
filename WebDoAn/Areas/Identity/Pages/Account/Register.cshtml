@@ -1,86 +1,110 @@
 ﻿@page
 @model RegisterModel
 @{
-    ViewData["Title"] = "Đăng Ký";
+    ViewData["Title"] = "Đăng ký tài khoản";
 }
 
-<div class="row">
-    <div class="col-md-8">
-        <h2 class="mb-4">Đăng Ký Tài Khoản</h2>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header text-center py-4 border-0" style="background-color: var(--primary-teal); color: white;">
+                    <h3 class="fw-bold mb-0"><i class="bi bi-person-plus-fill"></i> Tạo tài khoản mới</h3>
+                    <p class="mb-0 mt-1 small text-white-50">Tham gia cộng đồng RoomMate ngay hôm nay</p>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form id="registerForm" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
-        <form method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted small"><i class="bi bi-person-badge"></i> Bạn là ai?</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check border rounded p-3 flex-fill text-center hover-border-teal">
+                                    <input class="form-check-input d-none focus-teal" type="radio" name="UserType" id="typeTenant" value="Tenant" checked>
+                                    <label class="form-check-label w-100 cursor-pointer" for="typeTenant">
+                                        <i class="bi bi-backpack2 fs-3 d-block text-teal mb-1"></i>
+                                        Người thuê trọ
+                                    </label>
+                                </div>
+                                <div class="form-check border rounded p-3 flex-fill text-center hover-border-teal">
+                                    <input class="form-check-input d-none focus-teal" type="radio" name="UserType" id="typeLandlord" value="Landlord">
+                                    <label class="form-check-label w-100 cursor-pointer" for="typeLandlord">
+                                        <i class="bi bi-house-door fs-3 d-block text-teal mb-1"></i>
+                                        Chủ phòng trọ
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="mb-3">
-                <label asp-for="Input.Email" class="form-label">Email</label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control focus-teal" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email" class="text-muted">Địa chỉ Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6 form-floating">
+                                <input asp-for="Input.Password" class="form-control focus-teal" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.Password" class="text-muted ms-2">Mật khẩu</label>
+                                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 form-floating">
+                                <input asp-for="Input.ConfirmPassword" class="form-control focus-teal" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.ConfirmPassword" class="text-muted ms-2">Xác nhận mật khẩu</label>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <button id="registerSubmit" type="submit" class="btn text-white w-100 py-3 fw-bold rounded-pill shadow-sm hover-teal-dark mt-2" style="background-color: var(--primary-teal);">
+                            ĐĂNG KÝ NGAY
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <span class="text-muted small">Đã có tài khoản? </span>
+                        <a asp-page="./Login" class="text-decoration-none fw-bold" style="color: var(--primary-teal);">Đăng nhập tại đây</a>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.Password" class="form-label">Mật khẩu</label>
-                <input asp-for="Input.Password" class="form-control" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" />
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.UserType" class="form-label">Bạn là   </label>
-                <select asp-for="Input.UserType" class="form-select">
-                    <option value="Tenant">Người Thuê</option>
-                    <option value="Landlord">Người Cho Thuê</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.FullName" class="form-label"></label>
-                <input asp-for="Input.FullName" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.BirthYear" class="form-label"></label>
-                <input asp-for="Input.BirthYear" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.Gender" class="form-label"></label>
-                <select asp-for="Input.Gender" class="form-select">
-                    <option value="">-- Chọn giới tính --</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                    <option value="Khác">Khác</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.Hometown" class="form-label"></label>
-                <input asp-for="Input.Hometown" class="form-control" list="hometown-list" placeholder="Nhập để tìm nhanh..." />
-                <datalist id="hometown-list">
-                    <option value="Hà Nội"></option>
-                    <option value="TP. Hồ Chí Minh"></option>
-                    <option value="Đà Nẵng"></option>
-                    <option value="Hải Phòng"></option>
-                    <!-- ... thêm các tỉnh khác ... -->
-                </datalist>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Input.Avatar" class="form-label"></label>
-                <input type="file" asp-for="Input.Avatar" class="form-control" accept="image/*" />
-            </div>
-
-            <button type="submit" class="btn btn-primary">Đăng Ký</button>
-        </form>
+        </div>
     </div>
 </div>
 
-@section Scripts {
-    @{ 
-        await Html.RenderPartialAsync("_ValidationScriptsPartial"); 
+<style>
+    .focus-teal:focus {
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
     }
-}
+
+    .hover-teal-dark:hover {
+        background-color: var(--primary-teal-hover) !important;
+    }
+
+    .text-teal {
+        color: var(--primary-teal) !important;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .form-check-input:checked + .form-check-label {
+        font-weight: bold;
+        color: var(--primary-teal);
+    }
+
+    .form-check-input:checked ~ .form-check-label i {
+        color: var(--primary-teal) !important;
+    }
+
+    .hover-border-teal:hover {
+        border-color: var(--primary-teal) !important;
+        background-color: rgba(0, 150, 136, 0.05);
+    }
+
+    .form-check:has(input:checked) {
+        border-color: var(--primary-teal) !important;
+        background-color: rgba(0, 150, 136, 0.05);
+        border-width: 2px !important;
+    }
+</style>

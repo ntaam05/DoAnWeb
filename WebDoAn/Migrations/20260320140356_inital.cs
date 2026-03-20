@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebDoAn.Migrations
 {
     /// <inheritdoc />
-    public partial class initialOrder : Migration
+    public partial class inital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -96,7 +96,10 @@ namespace WebDoAn.Migrations
                     ImageUrlsData = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OwnerId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsRented = table.Column<bool>(type: "bit", nullable: false),
-                    JoinCode = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    JoinCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MapLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Hashtags = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -230,6 +233,30 @@ namespace WebDoAn.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoomComments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RoomPostId = table.Column<int>(type: "int", nullable: false),
+                    ReplyToCommentId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomComments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RoomComments_RoomPosts_RoomPostId",
+                        column: x => x.RoomPostId,
+                        principalTable: "RoomPosts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RoomTenants",
                 columns: table => new
                 {
@@ -312,6 +339,11 @@ namespace WebDoAn.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RoomComments_RoomPostId",
+                table: "RoomComments",
+                column: "RoomPostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RoomTenants_RoomPostId",
                 table: "RoomTenants",
                 column: "RoomPostId");
@@ -345,6 +377,9 @@ namespace WebDoAn.Migrations
 
             migrationBuilder.DropTable(
                 name: "Likes");
+
+            migrationBuilder.DropTable(
+                name: "RoomComments");
 
             migrationBuilder.DropTable(
                 name: "RoomTenants");

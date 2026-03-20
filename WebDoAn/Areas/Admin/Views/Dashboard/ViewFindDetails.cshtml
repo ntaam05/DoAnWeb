@@ -1,0 +1,47 @@
+﻿@model WebDoAn.Models.RoomPost
+
+@{
+    ViewData["Title"] = "Chi tiết bài tìm người ở ghép";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-warning text-dark fw-bold">
+            Chi tiết bài tìm người ở ghép
+        </div>
+
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <div class="mb-3"><strong>ID:</strong> @Model.Id</div>
+                    <div class="mb-3"><strong>Tiêu đề:</strong> @Model.Title</div>
+                    <div class="mb-3"><strong>Mô tả:</strong><br />@Model.Description</div>
+                    <div class="mb-3"><strong>Giá mong muốn:</strong> @Model.Price.ToString("N0") VNĐ</div>
+                    <div class="mb-3"><strong>Loại bài:</strong> @Model.PostType</div>
+                    <div class="mb-3"><strong>Người đăng:</strong> @Model.OwnerId</div>
+                    <div class="mb-3"><strong>Mã tham gia:</strong> @Model.JoinCode</div>
+
+                    <a asp-action="ManageFindPosts" class="btn btn-secondary">Quay lại</a>
+                </div>
+
+                <div class="col-md-5">
+                    <h5 class="mb-3">Hình ảnh</h5>
+
+                    @if (Model.ImageUrls != null && Model.ImageUrls.Any())
+                    {
+                        @foreach (var img in Model.ImageUrls)
+                        {
+                            <div class="mb-3">
+                                <img src="@img" class="img-fluid rounded border" style="max-height: 250px; object-fit: cover; width:100%;" />
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted">Không có hình ảnh.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

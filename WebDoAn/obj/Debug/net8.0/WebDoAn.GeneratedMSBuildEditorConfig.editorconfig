@@ -34,6 +34,42 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/Dashboard/ManageAdmins.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcRGFzaGJvYXJkXE1hbmFnZUFkbWlucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/Dashboard/ManageFindPosts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcRGFzaGJvYXJkXE1hbmFnZUZpbmRQb3N0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/Dashboard/ManageRoomPosts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcRGFzaGJvYXJkXE1hbmFnZVJvb21Qb3N0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/Dashboard/ManageUsers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcRGFzaGJvYXJkXE1hbmFnZVVzZXJzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/Dashboard/ViewFindDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcRGFzaGJvYXJkXFZpZXdGaW5kRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/Dashboard/ViewRoomDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcRGFzaGJvYXJkXFZpZXdSb29tRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Admin/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Coder/Web/DoAnWeb/WebDoAn/Areas/Identity/Pages/Account/AccessDenied.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -134,6 +170,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9vbVxEZXRhaWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Coder/Web/DoAnWeb/WebDoAn/Views/Room/Discuss.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9vbVxEaXNjdXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Coder/Web/DoAnWeb/WebDoAn/Views/Room/FindFeed.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9vbVxGaW5kRmVlZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -152,6 +192,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/Coder/Web/DoAnWeb/WebDoAn/Views/Room/Saved.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9vbVxTYXZlZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Coder/Web/DoAnWeb/WebDoAn/Views/Room/Search.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9vbVxTZWFyY2guY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Coder/Web/DoAnWeb/WebDoAn/Views/Shared/Error.cshtml]

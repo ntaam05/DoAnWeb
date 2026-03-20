@@ -100,6 +100,8 @@ namespace WebDoAn.Areas.Identity.Pages.Account
 
                 HttpContext.Session.SetString("CURRENT_USER_EMAIL", user.Email);
                 HttpContext.Session.SetString("CURRENT_USER_TYPE", user.UserType);
+                HttpContext.Session.SetString("CURRENT_USER_NAME", user.FullName ?? "");
+                HttpContext.Session.SetString("CURRENT_USER_AVATAR", user.AvatarUrl ?? "");
 
                 // Save email cookie if Remember Me checked
                 if (Input.RememberMe)

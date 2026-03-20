@@ -31,4 +31,6 @@ public class RoomPost
     public List<RoomTenant> Tenants { get; set; } = new();
 
     public string JoinCode { get; set; } = "";
+    public string? MapLink { get; set; }
+    public string? Hashtags { get; set; }
 }

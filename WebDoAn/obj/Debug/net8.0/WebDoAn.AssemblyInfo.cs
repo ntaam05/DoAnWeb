@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebDoAn")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aea9541121e4b61c0b0b021c895e385b8ec7f2ef")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8445cb80b6bcbda7e3d7f4fbda7173c2e75e30a7")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebDoAn")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebDoAn")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

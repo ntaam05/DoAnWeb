@@ -24,7 +24,8 @@ namespace WebDoAn.Areas.Admin.Controllers
 
         private bool IsAdmin(string? email)
         {
-            if (string.IsNullOrWhiteSpace(email)) return false;
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
 
             email = email.Trim().ToLowerInvariant();
             return _context.AdminRoles.Any(a => a.Email.ToLower() == email);
@@ -36,7 +37,7 @@ namespace WebDoAn.Areas.Admin.Controllers
 
             if (string.IsNullOrWhiteSpace(email))
             {
-                return Redirect("/Identity/Account/Login?ReturnUrl=/Admin/Dashboard");
+                return Redirect("/Identity/Account/Login?ReturnUrl=/Admin");
             }
 
             if (!IsAdmin(email))
@@ -80,6 +81,7 @@ namespace WebDoAn.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AddAdmin(string email)
         {
             var denied = CheckAdminAccess();
@@ -90,21 +92,21 @@ namespace WebDoAn.Areas.Admin.Controllers
             if (string.IsNullOrEmpty(email))
             {
                 TempData["Error"] = "Email không hợp lệ.";
-                return RedirectToAction("ManageAdmins");
+                return RedirectToAction(nameof(ManageAdmins));
             }
 
             var user = _context.UserAccounts.FirstOrDefault(u => u.Email.ToLower() == email);
             if (user == null)
             {
                 TempData["Error"] = "Email này chưa đăng ký.";
-                return RedirectToAction("ManageAdmins");
+                return RedirectToAction(nameof(ManageAdmins));
             }
 
             var existingAdmin = _context.AdminRoles.FirstOrDefault(a => a.Email.ToLower() == email);
             if (existingAdmin != null)
             {
                 TempData["Error"] = "Người này đã là Admin.";
-                return RedirectToAction("ManageAdmins");
+                return RedirectToAction(nameof(ManageAdmins));
             }
 
             var currentAdmin = GetCurrentUserEmail();
@@ -119,10 +121,11 @@ namespace WebDoAn.Areas.Admin.Controllers
             _context.SaveChanges();
 
             TempData["Message"] = $"Đã cấp quyền Admin cho {email}.";
-            return RedirectToAction("ManageAdmins");
+            return RedirectToAction(nameof(ManageAdmins));
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult RemoveAdmin(int adminId)
         {
             var denied = CheckAdminAccess();
@@ -132,21 +135,22 @@ namespace WebDoAn.Areas.Admin.Controllers
             if (admin == null)
             {
                 TempData["Error"] = "Không tìm thấy Admin.";
-                return RedirectToAction("ManageAdmins");
+                return RedirectToAction(nameof(ManageAdmins));
             }
 
             var currentAdmin = GetCurrentUserEmail();
-            if (admin.Email.Trim().ToLower() == currentAdmin)
+            if (!string.IsNullOrWhiteSpace(currentAdmin) &&
+                admin.Email.Trim().ToLower() == currentAdmin)
             {
                 TempData["Error"] = "Không thể xóa quyền Admin của chính mình.";
-                return RedirectToAction("ManageAdmins");
+                return RedirectToAction(nameof(ManageAdmins));
             }
 
             _context.AdminRoles.Remove(admin);
             _context.SaveChanges();
 
             TempData["Message"] = $"Đã xóa quyền Admin của {admin.Email}.";
-            return RedirectToAction("ManageAdmins");
+            return RedirectToAction(nameof(ManageAdmins));
         }
 
         public IActionResult ManageUsers()
@@ -162,6 +166,7 @@ namespace WebDoAn.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult BanUser(string email)
         {
             var denied = CheckAdminAccess();
@@ -173,17 +178,21 @@ namespace WebDoAn.Areas.Admin.Controllers
             if (user == null)
             {
                 TempData["Error"] = "Không tìm thấy người dùng.";
-                return RedirectToAction("ManageUsers");
+                return RedirectToAction(nameof(ManageUsers));
             }
 
             user.IsBanned = !user.IsBanned;
             _context.SaveChanges();
 
-            TempData["Message"] = user.IsBanned ? "Đã ban người dùng." : "Đã bỏ ban người dùng.";
-            return RedirectToAction("ManageUsers");
+            TempData["Message"] = user.IsBanned
+                ? "Đã ban người dùng."
+                : "Đã bỏ ban người dùng.";
+
+            return RedirectToAction(nameof(ManageUsers));
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteUser(string email)
         {
             var denied = CheckAdminAccess();
@@ -195,14 +204,14 @@ namespace WebDoAn.Areas.Admin.Controllers
             if (user == null)
             {
                 TempData["Error"] = "Không tìm thấy người dùng.";
-                return RedirectToAction("ManageUsers");
+                return RedirectToAction(nameof(ManageUsers));
             }
 
             _context.UserAccounts.Remove(user);
             _context.SaveChanges();
 
             TempData["Message"] = "Đã xóa người dùng.";
-            return RedirectToAction("ManageUsers");
+            return RedirectToAction(nameof(ManageUsers));
         }
 
         public IActionResult ManageRoomPosts()
@@ -234,6 +243,7 @@ namespace WebDoAn.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteRoomPost(int postId)
         {
             var denied = CheckAdminAccess();
@@ -243,14 +253,14 @@ namespace WebDoAn.Areas.Admin.Controllers
             if (post == null)
             {
                 TempData["Error"] = "Không tìm thấy bài đăng.";
-                return RedirectToAction("ManageRoomPosts");
+                return RedirectToAction(nameof(ManageRoomPosts));
             }
 
             _context.RoomPosts.Remove(post);
             _context.SaveChanges();
 
             TempData["Message"] = "Đã xóa bài đăng phòng cho thuê.";
-            return RedirectToAction("ManageRoomPosts");
+            return RedirectToAction(nameof(ManageRoomPosts));
         }
 
         public IActionResult ManageFindPosts()
@@ -280,6 +290,7 @@ namespace WebDoAn.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteFindPost(int postId)
         {
             var denied = CheckAdminAccess();
@@ -289,14 +300,14 @@ namespace WebDoAn.Areas.Admin.Controllers
             if (post == null)
             {
                 TempData["Error"] = "Không tìm thấy bài đăng.";
-                return RedirectToAction("ManageFindPosts");
+                return RedirectToAction(nameof(ManageFindPosts));
             }
 
             _context.RoomPosts.Remove(post);
             _context.SaveChanges();
 
             TempData["Message"] = "Đã xóa bài đăng tìm người.";
-            return RedirectToAction("ManageFindPosts");
+            return RedirectToAction(nameof(ManageFindPosts));
         }
     }
 }

@@ -12,8 +12,8 @@ using WebDoAn.Data;
 namespace WebDoAn.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260318134138_Initial")]
-    partial class Initial
+    [Migration("20260320084447_AddMapAndHashtag")]
+    partial class AddMapAndHashtag
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -295,6 +295,9 @@ namespace WebDoAn.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Hashtags")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ImageUrlsData")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -304,6 +307,9 @@ namespace WebDoAn.Migrations
 
                     b.Property<string>("JoinCode")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MapLink")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OwnerId")

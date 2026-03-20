@@ -1,0 +1,185 @@
+﻿@model WebDoAn.Models.RoomPost
+@using Microsoft.AspNetCore.Http
+@{
+    ViewData["Title"] = "Thảo luận";
+    var currentUserEmail = Context.Session.GetString("CURRENT_USER_EMAIL");
+    var chatMessages = ViewBag.Comments; // Dữ liệu Nickname và Avatar được lấy từ Controller đã fix
+}
+
+<style>
+    :root {
+        --primary-teal: #009688;
+        --chat-bg: #f4f6f9;
+        --msg-teal: #00a095;
+    }
+
+    .chat-window {
+        height: 550px;
+        overflow-y: auto;
+        background-color: var(--chat-bg);
+        padding: 25px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* VÒNG TRÒN NHỎ CỦA AVATAR CHAT */
+    .avatar-chat-circle {
+        width: 35px !important;
+        height: 35px !important;
+        min-width: 35px !important; /* Khóa chiều ngang không cho giãn */
+        max-width: 35px !important;
+        border-radius: 50% !important; /* Tạo vòng tròn */
+        object-fit: cover !important; /* Giữ tỉ lệ ảnh không bị móp */
+        flex-shrink: 0; /* Quan trọng: Ngăn Flexbox kéo giãn ảnh */
+        border: 1px solid #e0e0e0;
+        margin-right: 12px;
+        margin-top: 5px;
+    }
+
+    /* Đảm bảo group chứa avatar không kéo giãn nội dung bên trong */
+    .msg-group-other {
+        display: flex;
+        align-items: flex-start;
+        max-width: 85%;
+        margin-bottom: 10px;
+    }
+
+    .msg-other-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nickname-chat {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #65676b;
+        margin-left: 12px;
+        margin-bottom: 2px;
+    }
+
+    .bubble-other {
+        background: white;
+        color: #050505;
+        padding: 10px 16px;
+        border-radius: 18px;
+        border-top-left-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Tin nhắn của mình (Right) */
+    .msg-group-me {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-left: auto;
+        max-width: 80%;
+    }
+
+    .bubble-me {
+        background-color: var(--msg-teal);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 18px;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .msg-time-chat {
+        font-size: 0.65rem;
+        color: #8a8d91;
+        margin-top: 4px;
+        padding: 0 5px;
+    }
+
+    .chat-footer-form {
+        background: white;
+        padding: 15px;
+        border-top: 1px solid #e4e6eb;
+        border-radius: 0 0 12px 12px;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 20px;">
+                <h5 class="fw-bold mb-3" style="color: var(--primary-teal);"><i class="bi bi-info-circle-fill"></i> Thông tin bài đăng</h5>
+                <h4 class="fw-bold">@Model.Title</h4>
+                <p class="text-secondary mt-3 small">@Model.Description</p>
+                <hr class="border-secondary op-20">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="small text-muted">Bởi: <strong>@Model.OwnerId.Split('@')[0]</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow rounded-4 overflow-hidden">
+                <div class="chat-window" id="chatWindow">
+                    @if (chatMessages == null || chatMessages.Count == 0)
+                    {
+                        <div class="text-center my-auto opacity-50">
+                            <i class="bi bi-chat-left-text fs-1"></i>
+                            <p class="mt-2">Hãy gửi tin nhắn đầu tiên để bắt đầu cuộc thảo luận!</p>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var msg in chatMessages)
+                        {
+                            bool isMe = (msg.UserEmail == currentUserEmail);
+
+                            if (isMe)
+                            {
+                                <div class="msg-group-me">
+                                    <div class="bubble-me">@msg.Content</div>
+                                    <div class="msg-time-chat">@msg.CreatedAt.ToString("HH:mm")</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="msg-group-other">
+                                    <img src="@msg.Avatar" class="avatar-chat-circle" onerror="this.src='https://i.pravatar.cc/150?img=3'" />
+
+                                    <div class="msg-other-content">
+                                        <div class="nickname-chat">@msg.Nickname</div>
+                                        <div class="bubble-other">@msg.Content</div>
+                                        <div class="msg-time-chat text-start">@msg.CreatedAt.ToString("HH:mm")</div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+
+                <div class="chat-footer-form">
+                    @if (!string.IsNullOrEmpty(currentUserEmail))
+                    {
+                        <form method="post" asp-action="AddComment" asp-route-id="@Model.Id" class="d-flex gap-2 align-items-center">
+                            <input type="hidden" name="rating" value="5" />
+                            <input name="content" id="msgInput" class="form-control rounded-pill border-0 bg-light px-4 py-2" placeholder="Aa" required autocomplete="off" />
+                            <button type="submit" class="btn rounded-circle d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background-color: var(--primary-teal); color:white;">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="text-center py-2 fs-7">
+                            <a href="/Identity/Account/Login" class="text-teal text-decoration-none fw-bold">Đăng nhập</a> để tham gia thảo luận.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Luôn tự động cuộn xuống tin nhắn cuối cùng khi tải trang
+    const chatWindow = document.getElementById("chatWindow");
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+</script>

@@ -13,19 +13,31 @@ public class ProfileController : Controller
 
     private const string CURRENT_EMAIL = "CURRENT_USER_EMAIL";
     private const string CURRENT_TYPE = "CURRENT_USER_TYPE";
+    private const string CURRENT_AVATAR = "CURRENT_USER_AVATAR";
+    private const string CURRENT_NAME = "CURRENT_USER_NAME";
 
     public ProfileController(ApplicationDbContext context)
     {
         _context = context;
     }
 
+    // TRANG XEM HỒ SƠ (Cho cả Chủ trọ và Người thuê)
+    public IActionResult Index()
+    {
+        var email = HttpContext.Session.GetString(CURRENT_EMAIL);
+        if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Account");
+
+        var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
+        if (user == null) return RedirectToAction("Login", "Account");
+
+        return View(user);
+    }
+
+    // TRANG CHỈNH SỬA (Cho cả Chủ trọ và Người thuê)
     public IActionResult Edit()
     {
         var email = HttpContext.Session.GetString(CURRENT_EMAIL);
-        var type = HttpContext.Session.GetString(CURRENT_TYPE);
-
         if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Account");
-        if (type != "Tenant") return RedirectToAction("Index", "Home");
 
         var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
         if (user == null) return RedirectToAction("Login", "Account");
@@ -34,13 +46,10 @@ public class ProfileController : Controller
     }
 
     [HttpPost]
-    public IActionResult Edit(string fullName, string birthYear, string gender, string hometown, IFormFile? avatar)
+    public IActionResult Edit(string fullName, string birthYear, string gender, string hometown, string? croppedAvatar)
     {
         var email = HttpContext.Session.GetString(CURRENT_EMAIL);
-        var type = HttpContext.Session.GetString(CURRENT_TYPE);
-
         if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Account");
-        if (type != "Tenant") return RedirectToAction("Index", "Home");
 
         var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
         if (user == null) return RedirectToAction("Login", "Account");
@@ -50,163 +59,105 @@ public class ProfileController : Controller
         user.Gender = (gender ?? "").Trim();
         user.Hometown = (hometown ?? "").Trim();
 
-        var avatarPrefix = $"{user.Email}_{user.FullName}";
-        var newAvatar = SaveUpload(avatar, avatarPrefix, "avatars");
-
-        if (!string.IsNullOrEmpty(newAvatar))
+        // XỬ LÝ ẢNH ĐÃ CẮT (Dạng Base64 từ Cropper.js)
+        if (!string.IsNullOrEmpty(croppedAvatar) && croppedAvatar.Contains(","))
         {
-            DeleteLocalFile(user.AvatarUrl);
+            try
+            {
+                // Tách chuỗi base64 (bỏ phần data:image/jpeg;base64,)
+                string base64Data = croppedAvatar.Split(',')[1];
+                byte[] imageBytes = Convert.FromBase64String(base64Data);
 
-            user.AvatarUrl = newAvatar;
-            UpdateTenantAvatarAcrossRooms(user.Email, newAvatar);
+                // Tạo tên file duy nhất
+                string fileName = $"avt_{Guid.NewGuid():N}.jpg";
+                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
+
+                if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+
+                string filePath = Path.Combine(folderPath, fileName);
+
+                // Xóa ảnh cũ nếu có
+                DeleteLocalFile(user.AvatarUrl);
+
+                // Lưu file mới
+                System.IO.File.WriteAllBytes(filePath, imageBytes);
+                user.AvatarUrl = $"/uploads/avatars/{fileName}";
+
+                // Đồng bộ ảnh vào các bảng liên quan nếu là Người thuê
+                UpdateTenantAvatarAcrossRooms(user.Email, user.AvatarUrl);
+            }
+            catch (Exception ex)
+            {
+                TempData["AuthError"] = "Lỗi khi lưu ảnh: " + ex.Message;
+            }
         }
 
         _context.SaveChanges();
+
+        // CẬP NHẬT SESSION ĐỂ NAVBAR ĐỔI NGAY LẬP TỨC
+        HttpContext.Session.SetString(CURRENT_AVATAR, user.AvatarUrl ?? "");
+        HttpContext.Session.SetString(CURRENT_NAME, string.IsNullOrWhiteSpace(user.FullName) ? user.Email.Split('@')[0] : user.FullName);
 
         TempData["Message"] = "Cập nhật hồ sơ thành công.";
         return RedirectToAction("Index");
     }
 
-    public IActionResult Index()
-    {
-        var email = HttpContext.Session.GetString(CURRENT_EMAIL);
-        var type = HttpContext.Session.GetString(CURRENT_TYPE);
-
-        if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Account");
-        if (type != "Tenant") return RedirectToAction("Index", "Home");
-
-        var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
-        if (user == null) return RedirectToAction("Login", "Account");
-
-        return View(user);
-    }
-
+    // CHỈ NGƯỜI THUÊ MỚI CÓ QUYỀN DÙNG MÃ THAM GIA PHÒNG
     [HttpPost]
     public IActionResult JoinRoomByCode(string joinCode)
     {
         var email = HttpContext.Session.GetString(CURRENT_EMAIL);
         var type = HttpContext.Session.GetString(CURRENT_TYPE);
 
-        if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Account");
-        if (type != "Tenant") return RedirectToAction("Index", "Home");
+        if (string.IsNullOrEmpty(email) || type != "Tenant")
+        {
+            TempData["AuthError"] = "Chỉ người thuê mới có thể tham gia phòng.";
+            return RedirectToAction("Index");
+        }
 
         joinCode = (joinCode ?? "").Trim();
-
-        if (string.IsNullOrWhiteSpace(joinCode))
-        {
-            TempData["AuthError"] = "Vui lòng nhập mã phòng.";
-            return RedirectToAction("Index");
-        }
-
         var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
-        if (user == null)
-        {
-            TempData["AuthError"] = "Không tìm thấy tài khoản.";
-            return RedirectToAction("Index");
-        }
-
-        var room = _context.RoomPosts
-            .Include(x => x.Tenants)
-            .FirstOrDefault(x => x.PostType == "Room" && x.JoinCode == joinCode);
+        var room = _context.RoomPosts.Include(x => x.Tenants)
+                           .FirstOrDefault(x => x.PostType == "Room" && x.JoinCode == joinCode);
 
         if (room == null)
         {
-            TempData["AuthError"] = "Mã phòng không hợp lệ.";
+            TempData["AuthError"] = "Mã phòng không chính xác.";
             return RedirectToAction("Index");
         }
 
         if (room.Tenants.Any(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase)))
         {
-            TempData["AuthError"] = "Bạn đã tham gia phòng này rồi.";
+            TempData["AuthError"] = "Bạn đã có mặt trong phòng này.";
             return RedirectToAction("Index");
         }
 
         room.Tenants.Add(new RoomTenant
         {
             RoomPostId = room.Id,
-            Name = string.IsNullOrWhiteSpace(user.FullName) ? user.Email : user.FullName,
+            Name = string.IsNullOrWhiteSpace(user!.FullName) ? user.Email : user.FullName,
             Email = user.Email,
             Phone = "",
-            AvatarUrl = string.IsNullOrWhiteSpace(user.AvatarUrl)
-                ? "https://i.pravatar.cc/150?img=3"
-                : user.AvatarUrl
+            AvatarUrl = user.AvatarUrl ?? "https://i.pravatar.cc/150?img=3"
         });
 
-        room.IsRented = room.Tenants.Any();
         _context.SaveChanges();
-
-        TempData["Message"] = $"Tham gia phòng \"{room.Title}\" thành công.";
+        TempData["Message"] = $"Chào mừng bạn đến với phòng: {room.Title}";
         return RedirectToAction("Index");
     }
 
+    // Helper: Cập nhật ảnh đại diện ở các phòng đang ở
     private void UpdateTenantAvatarAcrossRooms(string email, string avatarUrl)
     {
-        var tenants = _context.RoomTenants
-            .Where(t => t.Email == email)
-            .ToList();
-
-        foreach (var tenant in tenants)
-        {
-            tenant.AvatarUrl = avatarUrl;
-        }
+        var tenants = _context.RoomTenants.Where(t => t.Email == email).ToList();
+        foreach (var t in tenants) t.AvatarUrl = avatarUrl;
     }
 
-    private string Slugify(string? text)
-    {
-        text = (text ?? "").Trim().ToLowerInvariant();
-        if (string.IsNullOrWhiteSpace(text)) return "empty";
-
-        text = RemoveVietnameseSigns(text);
-        text = Regex.Replace(text, @"\s+", "_");
-        text = Regex.Replace(text, @"[^a-z0-9_@.-]", "");
-        return string.IsNullOrWhiteSpace(text) ? "empty" : text;
-    }
-
-    private string RemoveVietnameseSigns(string text)
-    {
-        text = text.Replace("đ", "d").Replace("Đ", "D");
-        var normalized = text.Normalize(NormalizationForm.FormD);
-        var sb = new StringBuilder();
-
-        foreach (var c in normalized)
-        {
-            var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
-            if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
-                sb.Append(c);
-        }
-
-        return sb.ToString().Normalize(NormalizationForm.FormC);
-    }
-
-    private string? SaveUpload(IFormFile? file, string prefix, string folder)
-    {
-        if (file == null || file.Length == 0) return null;
-
-        var ext = Path.GetExtension(file.FileName);
-        var safePrefix = Slugify(prefix);
-        var fileName = $"{safePrefix}{ext}";
-
-        var dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folder);
-        Directory.CreateDirectory(dir);
-
-        var path = Path.Combine(dir, fileName);
-        using var stream = System.IO.File.Create(path);
-        file.CopyTo(stream);
-
-        return $"/uploads/{folder}/{fileName}";
-    }
-
+    // Helper: Xóa file vật lý
     private void DeleteLocalFile(string? relativePath)
     {
-        if (string.IsNullOrWhiteSpace(relativePath)) return;
-        if (!relativePath.StartsWith("/uploads/")) return;
-
-        var relative = relativePath.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString());
-        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relative);
-
-        if (System.IO.File.Exists(fullPath))
-        {
-            System.IO.File.Delete(fullPath);
-        }
+        if (string.IsNullOrWhiteSpace(relativePath) || !relativePath.StartsWith("/uploads/")) return;
+        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath.TrimStart('/'));
+        if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
     }
 }

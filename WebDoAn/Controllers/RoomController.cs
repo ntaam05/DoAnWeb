@@ -107,7 +107,7 @@ public class RoomController : Controller
     {
         var posts = _context.RoomPosts
             .Where(x => x.PostType == "Find")
-            .ToList();
+.ToList();
 
         return View(posts);
     }
@@ -134,6 +134,75 @@ public class RoomController : Controller
         ViewBag.AvgRate = 0.0;
 
         return View(post);
+    }
+
+    public IActionResult Discuss(int id)
+    {
+        var post = _context.RoomPosts.FirstOrDefault(x => x.Id == id);
+        if (post == null) return NotFound();
+
+        // 1. Thực hiện Join và lấy dữ liệu thô từ Database trước
+        var rawComments = _context.RoomComments
+            .Where(c => c.RoomPostId == id)
+            .Join(_context.UserAccounts,
+                comment => comment.UserEmail,
+                user => user.Email,
+                (comment, user) => new { comment, user })
+            .AsEnumerable() // Đưa về bộ nhớ (C#) để xử lý chuỗi phức tạp
+            .Select(x => new {
+                x.comment.Id,
+                x.comment.Content,
+                x.comment.CreatedAt,
+                x.comment.UserEmail,
+                // Ở đây bạn có thể dùng Split thoải mái vì đã là code C# thuần
+                Nickname = string.IsNullOrEmpty(x.user.FullName) ? x.user.Email.Split('@')[0] : x.user.FullName,
+                Avatar = string.IsNullOrEmpty(x.user.AvatarUrl) ? "https://i.pravatar.cc/150?img=3" : x.user.AvatarUrl
+            })
+            .OrderBy(x => x.CreatedAt)
+            .ToList();
+
+        ViewBag.Comments = rawComments;
+        return View(post);
+    }
+
+    public IActionResult Search(string[]? hashtags, string? priceRange, string? keyword)
+    {
+        // 1. Lấy tất cả bài đăng loại "Room"
+        var query = _context.RoomPosts.Where(x => x.PostType == "Room").AsQueryable();
+
+        // 2. Lọc theo từ khóa
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            var kw = keyword.ToLower();
+            query = query.Where(x => x.Title.ToLower().Contains(kw) || x.Description.ToLower().Contains(kw));
+        }
+
+        // 3. Lọc theo khoảng giá
+        if (!string.IsNullOrWhiteSpace(priceRange))
+        {
+            var parts = priceRange.Split('-');
+            if (parts.Length == 2 && long.TryParse(parts[0], out long min) && long.TryParse(parts[1], out long max))
+            {
+                query = query.Where(x => x.Price >= min && x.Price <= max);
+            }
+        }
+
+        // 4. Lấy dữ liệu về trước khi lọc list Hashtags (tránh lỗi EF Core)
+        var results = query.OrderByDescending(x => x.Id).ToList();
+
+        // 5. Lọc theo Hashtag
+        if (hashtags != null && hashtags.Length > 0)
+        {
+            results = results.Where(x => !string.IsNullOrEmpty(x.Hashtags) &&
+                                         hashtags.Any(h => x.Hashtags.Contains(h))).ToList();
+        }
+
+        // Truyền lại dữ liệu bộ lọc về View để hiển thị giữ nguyên trạng thái
+        ViewBag.Keyword = keyword;
+        ViewBag.PriceRange = priceRange;
+        ViewBag.SelectedHashtags = hashtags?.ToList() ?? new List<string>();
+
+        return View(results);
     }
 
     public IActionResult MyRooms()
@@ -212,7 +281,7 @@ public class RoomController : Controller
 
         var room = _context.RoomPosts
             .Include(x => x.Tenants)
-            .FirstOrDefault(x => x.Id == roomPostId && x.PostType == "Room" && x.OwnerId == Email);
+.FirstOrDefault(x => x.Id == roomPostId && x.PostType == "Room" && x.OwnerId == Email);
 
         if (room == null)
         {
@@ -484,7 +553,6 @@ public class RoomController : Controller
         {
             file.CopyTo(stream);
         }
-
         return "/" + folder + "/" + fileName;
     }
 
@@ -500,5 +568,40 @@ public class RoomController : Controller
         {
             System.IO.File.Delete(fullPath);
         }
+    }
+    [HttpPost]
+    public IActionResult AddComment(int id, string content, int rating)
+    {
+        // 1. Lấy email người dùng từ Session (Theo cách code hiện tại của bạn)
+        var email = HttpContext.Session.GetString("CURRENT_USER_EMAIL");
+
+        if (string.IsNullOrEmpty(email))
+        {
+            // Nếu chưa đăng nhập thì chuyển hướng về trang Login của Identity
+            return Redirect("/Identity/Account/Login");
+        }
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            TempData["AuthError"] = "Vui lòng nhập nội dung tin nhắn.";
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        // 2. Tạo đối tượng bình luận/tin nhắn mới
+        var comment = new RoomComment
+        {
+            RoomPostId = id,
+            Content = content,
+            Rating = rating,
+            UserEmail = email,
+            CreatedAt = DateTime.Now
+        };
+
+        // 3. Lưu vào Database
+        _context.RoomComments.Add(comment);
+        _context.SaveChanges();
+
+        // 4. Quay lại trang cũ (Trang Detail hoặc trang Discuss đều được)
+        return Redirect(Request.Headers["Referer"].ToString());
     }
 }

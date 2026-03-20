@@ -298,6 +298,9 @@ namespace WebDoAn.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ReplyToCommentId")
+                        .HasColumnType("int");
+
                     b.Property<int>("RoomPostId")
                         .HasColumnType("int");
 

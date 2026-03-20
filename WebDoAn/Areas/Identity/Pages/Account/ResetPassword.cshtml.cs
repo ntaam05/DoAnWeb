@@ -34,10 +34,15 @@ namespace WebDoAn.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
-            [StringLength(100, ErrorMessage = "Mật khẩu phải dài từ {2} đến {1} ký tự.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Mật khẩu phải dài từ {2} đến {1} ký tự.", MinimumLength = 8)]
             [DataType(DataType.Password)]
+            [RegularExpression(
+                @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$",
+                ErrorMessage = "Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
+            )]
             public string NewPassword { get; set; }
 
+            [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu")]
             [DataType(DataType.Password)]
             [Display(Name = "Xác nhận mật khẩu")]
             [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp")]

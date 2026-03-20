@@ -121,6 +121,7 @@ public class RoomController : Controller
         if (post == null) return NotFound();
 
         var email = HttpContext.Session.GetString(CURRENT_EMAIL);
+
         if (!string.IsNullOrEmpty(email))
         {
             ViewBag.IsSaved = _context.SavedRooms.Any(x => x.UserEmail == email && x.RoomPostId == id);
@@ -130,8 +131,15 @@ public class RoomController : Controller
             ViewBag.IsSaved = false;
         }
 
-        ViewBag.Comments = new List<RoomComment>();
-        ViewBag.AvgRate = 0.0;
+        var reviews = _context.RoomComments
+            .Where(x => x.RoomPostId == id && x.Rating > 0)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToList();
+
+        ViewBag.Comments = reviews;
+        ViewBag.AvgRate = reviews.Any() ? Math.Round(reviews.Average(x => x.Rating), 1) : 0.0;
+        ViewBag.RatingCount = reviews.Count;
+        ViewBag.HasReviewed = !string.IsNullOrEmpty(email) && reviews.Any(x => x.UserEmail == email);
 
         return View(post);
     }
@@ -141,27 +149,53 @@ public class RoomController : Controller
         var post = _context.RoomPosts.FirstOrDefault(x => x.Id == id);
         if (post == null) return NotFound();
 
-        // 1. Thực hiện Join và lấy dữ liệu thô từ Database trước
         var rawComments = _context.RoomComments
-            .Where(c => c.RoomPostId == id)
+            .Where(c => c.RoomPostId == id && c.Rating == 0)
             .Join(_context.UserAccounts,
                 comment => comment.UserEmail,
                 user => user.Email,
                 (comment, user) => new { comment, user })
-            .AsEnumerable() // Đưa về bộ nhớ (C#) để xử lý chuỗi phức tạp
-            .Select(x => new {
+            .AsEnumerable()
+            .Select(x => new
+            {
                 x.comment.Id,
                 x.comment.Content,
                 x.comment.CreatedAt,
                 x.comment.UserEmail,
-                // Ở đây bạn có thể dùng Split thoải mái vì đã là code C# thuần
-                Nickname = string.IsNullOrEmpty(x.user.FullName) ? x.user.Email.Split('@')[0] : x.user.FullName,
-                Avatar = string.IsNullOrEmpty(x.user.AvatarUrl) ? "https://i.pravatar.cc/150?img=3" : x.user.AvatarUrl
+                x.comment.ReplyToCommentId,
+                Nickname = string.IsNullOrEmpty(x.user.FullName)
+                    ? x.user.Email.Split('@')[0]
+                    : x.user.FullName,
+                Avatar = string.IsNullOrEmpty(x.user.AvatarUrl)
+                    ? "https://i.pravatar.cc/150?img=3"
+                    : x.user.AvatarUrl
             })
             .OrderBy(x => x.CreatedAt)
             .ToList();
 
-        ViewBag.Comments = rawComments;
+        var comments = rawComments
+            .Select(x =>
+            {
+                var replied = x.ReplyToCommentId != null
+                    ? rawComments.FirstOrDefault(c => c.Id == x.ReplyToCommentId)
+                    : null;
+
+                return new
+                {
+                    x.Id,
+                    x.Content,
+                    x.CreatedAt,
+                    x.UserEmail,
+                    x.Nickname,
+                    x.Avatar,
+                    x.ReplyToCommentId,
+                    ReplyToNickname = replied != null ? replied.Nickname : null,
+                    ReplyToContent = replied != null ? replied.Content : null
+                };
+            })
+            .ToList();
+
+        ViewBag.Comments = comments;
         return View(post);
     }
 
@@ -570,38 +604,83 @@ public class RoomController : Controller
         }
     }
     [HttpPost]
-    public IActionResult AddComment(int id, string content, int rating)
+    [HttpPost]
+    public IActionResult AddComment(int id, string content, int rating, int? replyToCommentId)
     {
-        // 1. Lấy email người dùng từ Session (Theo cách code hiện tại của bạn)
-        var email = HttpContext.Session.GetString("CURRENT_USER_EMAIL");
+        var email = HttpContext.Session.GetString(CURRENT_EMAIL);
+        var userType = HttpContext.Session.GetString(CURRENT_TYPE);
 
         if (string.IsNullOrEmpty(email))
         {
-            // Nếu chưa đăng nhập thì chuyển hướng về trang Login của Identity
             return Redirect("/Identity/Account/Login");
         }
 
+        var referer = Request.Headers["Referer"].ToString();
+
         if (string.IsNullOrWhiteSpace(content))
         {
-            TempData["AuthError"] = "Vui lòng nhập nội dung tin nhắn.";
-            return Redirect(Request.Headers["Referer"].ToString());
+            TempData["AuthError"] = "Vui lòng nhập nội dung.";
+            return Redirect(referer);
         }
 
-        // 2. Tạo đối tượng bình luận/tin nhắn mới
+        bool isDiscussPage = !string.IsNullOrWhiteSpace(referer) &&
+                             referer.Contains("/Room/Discuss/", StringComparison.OrdinalIgnoreCase);
+
+        bool isDetailPage = !string.IsNullOrWhiteSpace(referer) &&
+                            referer.Contains("/Room/Detail/", StringComparison.OrdinalIgnoreCase);
+
+        if (isDiscussPage)
+        {
+            rating = 0;
+        }
+        else if (isDetailPage)
+        {
+            if (userType != "Tenant")
+            {
+                TempData["AuthError"] = "Chỉ người thuê mới được đánh giá.";
+                return Redirect(referer);
+            }
+
+            var isCurrentTenant = _context.RoomTenants
+                .Any(x => x.RoomPostId == id && x.Email == email);
+
+            if (!isCurrentTenant)
+            {
+                TempData["AuthError"] = "Chỉ tài khoản đang thuê phòng này mới được đánh giá.";
+                return Redirect(referer);
+            }
+
+            if (rating < 1 || rating > 5)
+            {
+                TempData["AuthError"] = "Vui lòng chọn số sao hợp lệ từ 1 đến 5.";
+                return Redirect(referer);
+            }
+
+            var existedReview = _context.RoomComments
+                .FirstOrDefault(x => x.RoomPostId == id && x.UserEmail == email && x.Rating > 0);
+
+            if (existedReview != null)
+            {
+                TempData["AuthError"] = "Bạn đã đánh giá phòng này rồi. Mỗi email chỉ được đánh giá 1 lần.";
+                return Redirect(referer);
+            }
+
+            replyToCommentId = null;
+        }
+
         var comment = new RoomComment
         {
             RoomPostId = id,
-            Content = content,
+            Content = content.Trim(),
             Rating = rating,
             UserEmail = email,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
+            ReplyToCommentId = replyToCommentId
         };
 
-        // 3. Lưu vào Database
         _context.RoomComments.Add(comment);
         _context.SaveChanges();
 
-        // 4. Quay lại trang cũ (Trang Detail hoặc trang Discuss đều được)
-        return Redirect(Request.Headers["Referer"].ToString());
+        return Redirect(referer);
     }
 }

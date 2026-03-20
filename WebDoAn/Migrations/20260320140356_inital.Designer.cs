@@ -12,8 +12,8 @@ using WebDoAn.Data;
 namespace WebDoAn.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260320130623_AddCreatedAtToRoomPost")]
-    partial class AddCreatedAtToRoomPost
+    [Migration("20260320140356_inital")]
+    partial class inital
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -299,6 +299,9 @@ namespace WebDoAn.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplyToCommentId")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomPostId")

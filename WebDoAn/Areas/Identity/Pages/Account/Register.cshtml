@@ -6,53 +6,106 @@
 
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-6">
+        <div class="col-md-8 col-lg-7">
             <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
                 <div class="card-header text-center py-4 border-0" style="background-color: var(--primary-teal); color: white;">
                     <h3 class="fw-bold mb-0"><i class="bi bi-person-plus-fill"></i> Tạo tài khoản mới</h3>
                     <p class="mb-0 mt-1 small text-white-50">Tham gia cộng đồng RoomMate ngay hôm nay</p>
                 </div>
+
                 <div class="card-body p-4 p-md-5 bg-white">
-                    <form id="registerForm" method="post">
+                    <form id="registerForm" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-muted small"><i class="bi bi-person-badge"></i> Bạn là ai?</label>
+                            <label class="form-label fw-bold text-muted small">
+                                <i class="bi bi-person-badge"></i> Bạn là ai?
+                            </label>
+
                             <div class="d-flex gap-3">
-                                <div class="form-check border rounded p-3 flex-fill text-center hover-border-teal">
-                                    <input class="form-check-input d-none focus-teal" type="radio" name="UserType" id="typeTenant" value="Tenant" checked>
-                                    <label class="form-check-label w-100 cursor-pointer" for="typeTenant">
-                                        <i class="bi bi-backpack2 fs-3 d-block text-teal mb-1"></i>
-                                        Người thuê trọ
-                                    </label>
-                                </div>
-                                <div class="form-check border rounded p-3 flex-fill text-center hover-border-teal">
-                                    <input class="form-check-input d-none focus-teal" type="radio" name="UserType" id="typeLandlord" value="Landlord">
-                                    <label class="form-check-label w-100 cursor-pointer" for="typeLandlord">
-                                        <i class="bi bi-house-door fs-3 d-block text-teal mb-1"></i>
-                                        Chủ phòng trọ
-                                    </label>
-                                </div>
+                                <label class="border rounded p-3 flex-fill text-center hover-border-teal cursor-pointer user-type-option">
+                                    <input asp-for="Input.UserType" type="radio" value="Tenant" class="d-none user-type-radio" />
+                                    <i class="bi bi-backpack2 fs-3 d-block text-teal mb-1"></i>
+                                    <div class="fw-semibold">Người thuê trọ</div>
+                                </label>
+
+                                <label class="border rounded p-3 flex-fill text-center hover-border-teal cursor-pointer user-type-option">
+                                    <input asp-for="Input.UserType" type="radio" value="Landlord" class="d-none user-type-radio" />
+                                    <i class="bi bi-house-door fs-3 d-block text-teal mb-1"></i>
+                                    <div class="fw-semibold">Chủ phòng trọ</div>
+                                </label>
+                            </div>
+
+                            <span asp-validation-for="Input.UserType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 form-floating">
+                                <input asp-for="Input.Email" class="form-control focus-teal" autocomplete="username" placeholder="name@example.com" />
+                                <label asp-for="Input.Email" class="text-muted">Địa chỉ Email</label>
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 form-floating">
+                                <input asp-for="Input.FullName" class="form-control focus-teal" placeholder="Họ và tên" />
+                                <label asp-for="Input.FullName" class="text-muted">Họ tên</label>
+                                <span asp-validation-for="Input.FullName" class="text-danger small"></span>
                             </div>
                         </div>
 
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.Email" class="form-control focus-teal" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email" class="text-muted">Địa chỉ Email</label>
-                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4 form-floating">
+                                <input asp-for="Input.BirthYear" class="form-control focus-teal" placeholder="1990" />
+                                <label asp-for="Input.BirthYear" class="text-muted">Năm sinh</label>
+                                <span asp-validation-for="Input.BirthYear" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 form-floating">
+                                <select asp-for="Input.Gender" class="form-select focus-teal">
+                                    <option value="">-- Chọn giới tính --</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                                <label asp-for="Input.Gender" class="text-muted">Giới tính</label>
+                                <span asp-validation-for="Input.Gender" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 form-floating">
+                                <input asp-for="Input.Hometown" class="form-control focus-teal" placeholder="Quê quán" />
+                                <label asp-for="Input.Hometown" class="text-muted">Quê quán</label>
+                                <span asp-validation-for="Input.Hometown" class="text-danger small"></span>
+                            </div>
                         </div>
 
                         <div class="row g-3 mb-4">
-                            <div class="col-md-6 form-floating">
-                                <input asp-for="Input.Password" class="form-control focus-teal" autocomplete="new-password" aria-required="true" placeholder="password" />
-                                <label asp-for="Input.Password" class="text-muted ms-2">Mật khẩu</label>
-                                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            <div class="col-md-6 position-relative">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Password" id="registerPassword" class="form-control focus-teal" autocomplete="new-password" placeholder="Mật khẩu" />
+                                    <label asp-for="Input.Password" class="text-muted">Mật khẩu</label>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary position-absolute" id="toggleRegisterPassword" style="top:12px; right:10px; z-index:10;">
+                                    <i class="bi bi-eye" id="registerToggleIcon"></i>
+                                </button>
+                                <span asp-validation-for="Input.Password" class="text-danger small d-block mt-2"></span>
                             </div>
-                            <div class="col-md-6 form-floating">
-                                <input asp-for="Input.ConfirmPassword" class="form-control focus-teal" autocomplete="new-password" aria-required="true" placeholder="password" />
-                                <label asp-for="Input.ConfirmPassword" class="text-muted ms-2">Xác nhận mật khẩu</label>
-                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+
+                            <div class="col-md-6 position-relative">
+                                <div class="form-floating">
+                                    <input asp-for="Input.ConfirmPassword" id="registerConfirmPassword" class="form-control focus-teal" autocomplete="new-password" placeholder="Xác nhận mật khẩu" />
+                                    <label asp-for="Input.ConfirmPassword" class="text-muted">Xác nhận mật khẩu</label>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary position-absolute" id="toggleRegisterConfirmPassword" style="top:12px; right:10px; z-index:10;">
+                                    <i class="bi bi-eye" id="registerConfirmToggleIcon"></i>
+                                </button>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small d-block mt-2"></span>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Avatar" class="form-label text-muted">Avatar (tuỳ chọn)</label>
+                            <input asp-for="Input.Avatar" type="file" class="form-control" accept="image/*" />
+                            <span asp-validation-for="Input.Avatar" class="text-danger small"></span>
                         </div>
 
                         <button id="registerSubmit" type="submit" class="btn text-white w-100 py-3 fw-bold rounded-pill shadow-sm hover-teal-dark mt-2" style="background-color: var(--primary-teal);">
@@ -88,23 +141,87 @@
         cursor: pointer;
     }
 
-    .form-check-input:checked + .form-check-label {
-        font-weight: bold;
-        color: var(--primary-teal);
-    }
-
-    .form-check-input:checked ~ .form-check-label i {
-        color: var(--primary-teal) !important;
-    }
-
     .hover-border-teal:hover {
         border-color: var(--primary-teal) !important;
         background-color: rgba(0, 150, 136, 0.05);
     }
 
-    .form-check:has(input:checked) {
-        border-color: var(--primary-teal) !important;
-        background-color: rgba(0, 150, 136, 0.05);
-        border-width: 2px !important;
+    .user-type-option {
+        transition: all 0.2s ease;
     }
+
+        .user-type-option.active {
+            border: 2px solid var(--primary-teal) !important;
+            background-color: rgba(0, 150, 136, 0.08);
+            box-shadow: 0 0 0 0.2rem rgba(0, 150, 136, 0.15);
+        }
+
+            .user-type-option.active .fw-semibold,
+            .user-type-option.active i {
+                color: var(--primary-teal) !important;
+                font-weight: 700 !important;
+            }
 </style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            function togglePassword(btnId, inputId, iconId) {
+                var btn = document.getElementById(btnId);
+                var input = document.getElementById(inputId);
+                var icon = document.getElementById(iconId);
+
+                if (!btn || !input) return;
+
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        if (icon) icon.className = 'bi bi-eye-slash';
+                    } else {
+                        input.type = 'password';
+                        if (icon) icon.className = 'bi bi-eye';
+                    }
+                });
+            }
+
+            function initUserTypeSelection() {
+                var radios = document.querySelectorAll('.user-type-radio');
+                var options = document.querySelectorAll('.user-type-option');
+
+                function updateSelectedState() {
+                    options.forEach(function (option) {
+                        option.classList.remove('active');
+
+                        var radio = option.querySelector('.user-type-radio');
+                        if (radio && radio.checked) {
+                            option.classList.add('active');
+                        }
+                    });
+                }
+
+                radios.forEach(function (radio) {
+                    radio.addEventListener('change', updateSelectedState);
+                });
+
+                options.forEach(function (option) {
+                    option.addEventListener('click', function () {
+                        var radio = option.querySelector('.user-type-radio');
+                        if (radio) {
+                            radio.checked = true;
+                            radio.dispatchEvent(new Event('change'));
+                        }
+                    });
+                });
+
+                updateSelectedState();
+            }
+
+            togglePassword('toggleRegisterPassword', 'registerPassword', 'registerToggleIcon');
+            togglePassword('toggleRegisterConfirmPassword', 'registerConfirmPassword', 'registerConfirmToggleIcon');
+            initUserTypeSelection();
+        })();
+    </script>
+}

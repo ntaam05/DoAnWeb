@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +14,12 @@ using WebDoAn.Models;
 
 namespace WebDoAn.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
     public class LogoutModel : PageModel
     {
-        private const string CURRENT_EMAIL = "CURRENT_USER_EMAIL";
-        private const string CURRENT_TYPE = "CURRENT_USER_TYPE";
-        private const string RESET_EMAIL_KEY = "RESET_EMAIL";
-        private const string RESET_CODE_KEY = "RESET_CODE";
-        private const string RESET_EXPIRE_KEY = "RESET_EXPIRE";
-        private const string RESET_VERIFIED_KEY = "RESET_VERIFIED";
-
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
+        private const string REMEMBER_ME_EMAIL = "REMEMBER_ME_EMAIL";
 
         public LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger)
         {
@@ -31,39 +27,43 @@ namespace WebDoAn.Areas.Identity.Pages.Account
             _logger = logger;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            HttpContext.Session.Remove(CURRENT_EMAIL);
-            HttpContext.Session.Remove(CURRENT_TYPE);
-            HttpContext.Session.Remove(RESET_EMAIL_KEY);
-            HttpContext.Session.Remove(RESET_CODE_KEY);
-            HttpContext.Session.Remove(RESET_EXPIRE_KEY);
-            HttpContext.Session.Remove(RESET_VERIFIED_KEY);
+            try
+            {
+                // Sign out Identity cookie(s)
+                await _signInManager.SignOutAsync();
+                await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                await HttpContext.SignOutAsync(IdentityConstants.TwoFactorUserIdScheme);
 
-            return RedirectToPage("/Index", new { area = "" });
+                _logger.LogInformation("User logged out.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during sign out.");
+            }
+
+            // Clear session + remember cookie
+            HttpContext.Session.Remove("CURRENT_USER_EMAIL");
+            HttpContext.Session.Remove("CURRENT_USER_TYPE");
+            HttpContext.Session.Remove("RESET_EMAIL");
+            HttpContext.Session.Remove("RESET_CODE");
+            HttpContext.Session.Remove("RESET_EXPIRE");
+            HttpContext.Session.Remove("RESET_VERIFIED");
+            HttpContext.Session.Clear();
+
+            Response.Cookies.Delete(REMEMBER_ME_EMAIL);
+
+            // Redirect safely to provided returnUrl or home
+            var target = string.IsNullOrEmpty(returnUrl) ? Url.Content("~/") : returnUrl;
+            return LocalRedirect(target);
         }
 
-        public async Task<IActionResult> OnPost(string returnUrl = null)
+        public IActionResult OnGet()
         {
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
-            HttpContext.Session.Remove(CURRENT_EMAIL);
-            HttpContext.Session.Remove(CURRENT_TYPE);
-            HttpContext.Session.Remove(RESET_EMAIL_KEY);
-            HttpContext.Session.Remove(RESET_CODE_KEY);
-            HttpContext.Session.Remove(RESET_EXPIRE_KEY);
-            HttpContext.Session.Remove(RESET_VERIFIED_KEY);
-
-            if (returnUrl != null)
-            {
-                return LocalRedirect(returnUrl);
-            }
-            else
-            {
-                // This needs to be a redirect so that the browser performs a new
-                // request and the identity for the user gets updated.
-                return RedirectToPage();
-            }
+            // GET -> redirect home
+            return Redirect(Url.Content("~/"));
         }
     }
 }

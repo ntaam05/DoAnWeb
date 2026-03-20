@@ -58,7 +58,12 @@
                         @if (!string.IsNullOrEmpty(email))
                         {
                             <li class="nav-item"><a class="nav-link" href="/Profile/Index">Hồ sơ</a></li>
-
+                            @if (type == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link fw-bold text-info" href="/Admin/Dashboard/Index"><i class="bi bi-shield-lock-fill"></i> Quản trị hệ thống</a>
+                                </li>
+                            }
                             @if (type == "Landlord")
                             {
                                 <li class="nav-item"><a class="nav-link" href="/Room/Create">Đăng phòng</a></li>
@@ -70,7 +75,7 @@
                                 <li class="nav-item"><a class="nav-link" href="/Room/Saved"><i class="bi bi-heart-fill"></i> Đã lưu</a></li>
                             }
 
-                            <li class="nav-item ms-lg-3">
+                           
                                 <div class="d-flex align-items-center gap-3">
                                     <a href="/Profile/Index" class="nav-link fw-bold text-warning border border-warning rounded-pill px-3 py-1 d-flex align-items-center gap-2">
                                         @{
@@ -94,7 +99,7 @@
                                         </form>
                                     </li>
                                 </div>
-                            </li>
+                            
                         }
                         else
                         {

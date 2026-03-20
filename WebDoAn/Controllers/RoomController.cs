@@ -137,7 +137,7 @@ public class RoomController : Controller
             .ToList();
 
         ViewBag.Comments = reviews;
-        ViewBag.AvgRate = reviews.Any() ? Math.Round(reviews.Average(x => x.Rating), 1) : 0.0;
+        ViewBag.AvgRate = Math.Round(reviews.Average(x => (decimal?)x.Rating) ?? 0.0m, 1);
         ViewBag.RatingCount = reviews.Count;
         ViewBag.HasReviewed = !string.IsNullOrEmpty(email) && reviews.Any(x => x.UserEmail == email);
 

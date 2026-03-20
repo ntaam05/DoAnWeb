@@ -15,394 +15,217 @@
         var prop = obj.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
         return prop?.GetValue(obj);
     }
-
-    public string GetPropString(object obj, string propName)
-    {
-        var val = GetProp(obj, propName);
-        return val?.ToString() ?? "";
-    }
-
+    public string GetPropString(object obj, string propName) => GetProp(obj, propName)?.ToString() ?? "";
     public int? GetPropInt(object obj, string propName)
     {
         var val = GetProp(obj, propName);
         if (val == null) return null;
-        if (val is int i) return i;
-        if (int.TryParse(val.ToString(), out var result)) return result;
-        return null;
+        return (val is int i) ? i : (int.TryParse(val.ToString(), out var result) ? result : null);
     }
-
     public DateTime? GetPropDate(object obj, string propName)
     {
         var val = GetProp(obj, propName);
         if (val == null) return null;
-        if (val is DateTime dt) return dt;
-        if (DateTime.TryParse(val.ToString(), out var result)) return result;
-        return null;
-    }
-
-    public object FindMessageById(dynamic chatMessages, int? id)
-    {
-        if (chatMessages == null || id == null) return null;
-
-        foreach (var item in chatMessages)
-        {
-            var itemId = GetPropInt(item, "Id");
-            if (itemId == id) return item;
-        }
-
-        return null;
-    }
-
-    public string SafePreview(string text, int maxLen = 40)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return "";
-        text = text.Replace("\r", " ").Replace("\n", " ").Trim();
-        if (text.Length <= maxLen) return text;
-        return text.Substring(0, maxLen) + "...";
-    }
-
-    public bool IsSticker(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return false;
-        return text.StartsWith("[sticker:") && text.EndsWith("]");
-    }
-
-    public string RenderSticker(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return "🙂";
-
-        return text.Trim().ToLower() switch
-        {
-            "[sticker:like]" => "👍",
-            "[sticker:love]" => "❤️",
-            "[sticker:haha]" => "😂",
-            "[sticker:wow]" => "😮",
-            "[sticker:sad]" => "😭",
-            "[sticker:angry]" => "😡",
-            _ => "🙂"
-        };
+        return (val is DateTime dt) ? dt : (DateTime.TryParse(val.ToString(), out var result) ? result : null);
     }
 }
 
 <style>
     :root {
         --primary-teal: #009688;
-        --chat-bg: #f5f7fb;
-        --msg-teal: #0ea79d;
-        --reply-bg-other: #eef3f8;
-        --reply-bg-me: rgba(255,255,255,0.18);
-        --reply-border: #7aa7ff;
+        --chat-bg: #f8f9fa;
+        --msg-teal: #14a298;
+        --reply-border: #00bcd4;
+    }
+
+    .chat-container-main {
+        display: flex;
+        flex-direction: column;
+        height: 550px;
+        background-color: var(--chat-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #eee;
     }
 
     .chat-window {
-        height: 550px;
+        flex-grow: 1;
         overflow-y: auto;
-        background-color: var(--chat-bg);
-        padding: 16px;
-        border-radius: 12px 12px 0 0;
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+    }
+
+    .chat-footer-form {
+        background: white;
+        padding: 15px;
+        border-top: 1px solid #eee;
+        position: relative;
     }
 
     .avatar-chat-circle {
         width: 34px !important;
         height: 34px !important;
         min-width: 34px !important;
-        max-width: 34px !important;
+        flex-shrink: 0 !important;
         border-radius: 50% !important;
         object-fit: cover !important;
-        flex-shrink: 0;
-        border: 1px solid #e0e0e0;
-        margin-right: 10px;
-        margin-top: 2px;
+        margin-right: 8px;
+        border: 1px solid #ddd;
     }
 
-    .msg-group-other {
+    .msg-group {
         display: flex;
-        align-items: flex-end;
-        max-width: 75%;
-        margin-bottom: 2px;
-    }
-
-    .msg-other-content {
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        align-items: flex-start;
-    }
-
-    .nickname-chat {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #5f6772;
-        margin-left: 8px;
-        margin-bottom: 3px;
+        max-width: 85%;
+        position: relative;
+        margin-bottom: 8px;
     }
 
     .msg-group-me {
-        display: flex;
+        margin-left: auto;
         flex-direction: column;
         align-items: flex-end;
-        margin-left: auto;
-        max-width: 75%;
     }
 
-    .bubble-other,
-    .bubble-me {
-        padding: 9px 13px;
-        border-radius: 16px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-        word-break: break-word;
-        white-space: pre-wrap;
+    .msg-other-wrapper {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    /* FIX BUBBLE: Thêm min-width và margin-bottom để không bị che icon */
+    .bubble {
+        padding: 10px 16px;
+        border-radius: 18px;
         font-size: 0.95rem;
-        line-height: 1.4;
-        display: inline-block;
-        width: fit-content;
-        max-width: 320px;
-        min-width: 0;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        width: fit-content !important;
+        min-width: 65px !important; /* Đảm bảo đủ chỗ cho icon */
+        margin-bottom: 12px; /* Tạo khoảng trống cho badge trồi xuống */
     }
 
     .bubble-other {
-        background: #fff;
-        color: #111;
-        border-top-left-radius: 6px;
-        align-self: flex-start;
+        background: white;
+        color: #050505;
+        border-bottom-left-radius: 4px;
     }
 
     .bubble-me {
         background-color: var(--msg-teal);
         color: white;
-        border-bottom-right-radius: 6px;
-        align-self: flex-end;
+        border-bottom-right-radius: 4px;
     }
 
-    .msg-time-chat {
-        font-size: 0.7rem;
-        color: #8a8d91;
+    /* REACTION BADGE: Nổi bật hơn, chống bị che */
+    .reaction-badge {
+        position: absolute;
+        bottom: -12px;
+        right: 8px;
+        background: white;
+        border-radius: 15px;
+        padding: 2px 5px;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        display: none;
+        z-index: 10;
+        border: 1px solid #f0f0f0;
+        line-height: 1;
     }
 
-    .msg-meta-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 3px;
-        padding: 0 4px;
-        width: fit-content;
-    }
-
-    .btn-reply-text {
-        border: none;
-        background: transparent;
-        color: #6c757d;
-        font-size: 0.74rem;
-        padding: 0;
-        cursor: pointer;
-    }
-
-        .btn-reply-text:hover {
-            color: var(--primary-teal);
-            text-decoration: underline;
+        .reaction-badge.active {
+            display: block;
         }
 
-    .reply-quote {
-        padding: 6px 8px;
-        border-left: 3px solid var(--reply-border);
-        border-radius: 10px;
-        margin-bottom: 6px;
-        width: 100%;
-        box-sizing: border-box;
+    .msg-group-me .reaction-badge {
+        right: auto;
+        left: 8px;
     }
 
-    .bubble-other .reply-quote {
-        background: var(--reply-bg-other);
-    }
-
-    .bubble-me .reply-quote {
-        background: var(--reply-bg-me);
-    }
-
-    .reply-quote-name {
-        font-size: 0.7rem;
-        font-weight: 700;
-        margin-bottom: 2px;
-    }
-
-    .bubble-other .reply-quote-name {
-        color: #2b5cab;
-    }
-
-    .bubble-me .reply-quote-name {
-        color: #fff;
-    }
-
-    .reply-quote-text {
-        font-size: 0.74rem;
-        opacity: 0.95;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 230px;
-    }
-
-    .chat-footer-form {
+    /* REACTION BAR (THANH CHỌN EMOJI) */
+    .reaction-bar {
+        position: absolute;
+        top: -42px;
         background: white;
-        padding: 12px 14px;
-        border-top: 1px solid #e4e6eb;
-        border-radius: 0 0 12px 12px;
+        border-radius: 25px;
+        padding: 5px 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        display: none;
+        gap: 12px;
+        z-index: 100;
+        border: 1px solid #eee;
     }
+
+    .msg-group:hover .reaction-bar {
+        display: flex;
+    }
+
+    .reaction-item {
+        cursor: pointer;
+        transition: transform 0.2s;
+        font-size: 1.3rem;
+    }
+
+        .reaction-item:hover {
+            transform: scale(1.5);
+        }
+
+    .msg-tools {
+        display: flex;
+        gap: 10px;
+        margin-top: -5px;
+        font-size: 0.68rem;
+        color: #8a8d91;
+        padding: 0 5px;
+    }
+
+    .btn-reply-action {
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+        .btn-reply-action:hover {
+            color: var(--primary-teal);
+        }
 
     .reply-preview-box {
         display: none;
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
+        background: #f0f2f5;
+        padding: 8px 12px;
         border-left: 4px solid var(--primary-teal);
-        border-radius: 12px;
-        padding: 8px 10px;
-        margin-bottom: 8px;
+        border-radius: 8px;
+        margin-bottom: 10px;
     }
 
         .reply-preview-box.show {
             display: block;
         }
 
-    .reply-preview-title {
-        font-size: 0.74rem;
-        font-weight: 700;
-        color: var(--primary-teal);
-        margin-bottom: 2px;
-    }
-
-    .reply-preview-text {
-        font-size: 0.81rem;
-        color: #6c757d;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .btn-cancel-reply {
-        border: none;
-        background: transparent;
-        color: #888;
-        font-size: 1rem;
-        cursor: pointer;
-        line-height: 1;
-    }
-
-        .btn-cancel-reply:hover {
-            color: #dc3545;
-        }
-
     .chat-input-wrap {
         display: flex;
         align-items: center;
-        gap: 8px;
-        background: #f3f5f7;
-        border-radius: 999px;
-        padding: 6px 8px 6px 10px;
+        gap: 10px;
+        background: #f0f2f5;
+        border-radius: 20px;
+        padding: 5px 15px;
     }
-
-    .chat-tool-btn {
-        width: 34px;
-        height: 34px;
-        border: none;
-        background: transparent;
-        border-radius: 50%;
-        color: #667085;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
-
-        .chat-tool-btn:hover {
-            background: #e7ecef;
-            color: var(--primary-teal);
-        }
 
     .chat-text-input {
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
-        padding: 8px 6px !important;
-        font-size: 0.95rem;
     }
-
-        .chat-text-input:focus {
-            box-shadow: none !important;
-        }
 
     .send-btn-chat {
-        width: 40px;
-        height: 40px;
-        border: none;
-        border-radius: 50%;
-        background-color: var(--primary-teal);
+        background: var(--primary-teal);
         color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .send-btn-chat:hover {
-            opacity: 0.95;
-        }
-
-    .emoji-panel,
-    .sticker-panel {
-        display: none;
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 10px;
-        margin-bottom: 10px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    }
-
-        .emoji-panel.show,
-        .sticker-panel.show {
-            display: block;
-        }
-
-    .emoji-list,
-    .sticker-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .emoji-item,
-    .sticker-item {
         border: none;
-        background: #f8fafc;
-        border-radius: 10px;
-        padding: 6px 10px;
-        cursor: pointer;
-        font-size: 1.1rem;
-    }
-
-        .emoji-item:hover,
-        .sticker-item:hover {
-            background: #eef2f6;
-        }
-
-    .sticker-render {
-        font-size: 2.2rem;
-        line-height: 1;
-        display: inline-flex;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 56px;
-        min-height: 44px;
-    }
-
-        .sticker-render.large {
-            font-size: 2.6rem;
-        }
-
-    .msg-text-content {
-        display: inline;
     }
 </style>
 
@@ -410,221 +233,84 @@
     <div class="row g-4">
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 20px;">
-                <h5 class="fw-bold mb-3" style="color: var(--primary-teal);">
-                    <i class="bi bi-info-circle-fill"></i> Thông tin bài đăng
-                </h5>
+                <h5 class="fw-bold mb-3" style="color: var(--primary-teal);"><i class="bi bi-info-circle-fill"></i> Thông tin thảo luận</h5>
                 <h4 class="fw-bold">@Model.Title</h4>
-                <p class="text-secondary mt-3 small">@Model.Description</p>
-                <hr class="border-secondary op-20">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-person-circle"></i>
-                    <span class="small text-muted">Bởi: <strong>@Model.OwnerId.Split('@')[0]</strong></span>
-                </div>
+                <p class="text-secondary small">@Model.Description</p>
+                <hr>
+                <div class="small text-muted">Bởi: <strong>@Model.OwnerId.Split('@')[0]</strong></div>
             </div>
         </div>
 
         <div class="col-lg-8">
-            <div class="card border-0 shadow rounded-4 overflow-hidden">
+            <div class="chat-container-main bg-white shadow-sm">
                 <div class="chat-window" id="chatWindow">
-                    @if (chatMessages == null || chatMessages.Count == 0)
-                    {
-                        <div class="text-center my-auto opacity-50">
-                            <i class="bi bi-chat-left-text fs-1"></i>
-                            <p class="mt-2">Hãy gửi tin nhắn đầu tiên để bắt đầu cuộc thảo luận!</p>
-                        </div>
-                    }
-                    else
+                    @if (chatMessages != null)
                     {
                         foreach (var msg in chatMessages)
                         {
-                            var msgId = GetPropInt(msg, "Id");
-                            var userEmail = GetPropString(msg, "UserEmail");
+                            var email = GetPropString(msg, "UserEmail");
                             var nickname = GetPropString(msg, "Nickname");
-                            var avatar = GetPropString(msg, "Avatar");
                             var content = GetPropString(msg, "Content");
-                            var createdAt = GetPropDate(msg, "CreatedAt");
-                            var replyToCommentId = GetPropInt(msg, "ReplyToCommentId");
+                            var time = GetPropDate(msg, "CreatedAt");
+                            var msgId = GetPropInt(msg, "Id");
+                            bool isMe = (email == currentUserEmail);
 
-                            var replyToNickname = GetPropString(msg, "ReplyToNickname");
-                            var replyToContent = GetPropString(msg, "ReplyToContent");
-
-                            if (replyToCommentId != null && (string.IsNullOrWhiteSpace(replyToNickname) || string.IsNullOrWhiteSpace(replyToContent)))
-                            {
-                                var repliedMsg = FindMessageById(chatMessages, replyToCommentId);
-                                if (repliedMsg != null)
-                                {
-                                    if (string.IsNullOrWhiteSpace(replyToNickname))
+                            <div class="msg-group @(isMe ? "msg-group-me" : "msg-group-other")" data-id="@msgId">
+                                <div class="msg-other-wrapper">
+                                    @if (!isMe)
                                     {
-                                        replyToNickname = GetPropString(repliedMsg, "Nickname");
-                                        if (string.IsNullOrWhiteSpace(replyToNickname))
-                                        {
-                                            var repliedEmail = GetPropString(repliedMsg, "UserEmail");
-                                            replyToNickname = !string.IsNullOrWhiteSpace(repliedEmail) ? repliedEmail.Split('@')[0] : "Người dùng";
-                                        }
+                                        <img src="@GetPropString(msg, "Avatar")" class="avatar-chat-circle" onerror="this.src='https://i.pravatar.cc/150?img=3'" />
                                     }
-
-                                    if (string.IsNullOrWhiteSpace(replyToContent))
-                                    {
-                                        replyToContent = GetPropString(repliedMsg, "Content");
-                                    }
-                                }
-                            }
-
-                            bool isMe = (userEmail == currentUserEmail);
-
-                            if (isMe)
-                            {
-                                <div class="msg-group-me">
-                                    <div class="bubble-me">
-                                        @if (replyToCommentId != null && !string.IsNullOrWhiteSpace(replyToContent))
-                                        {
-                                            <div class="reply-quote">
-                                                <div class="reply-quote-name">@replyToNickname</div>
-                                                <div class="reply-quote-text">@SafePreview(replyToContent)</div>
-                                            </div>
-                                        }
-
-                                        @if (IsSticker(content))
-                                        {
-                                            <div class="sticker-render large">@RenderSticker(content)</div>
-                                        }
-                                        else
-                                        {
-                                            <span class="msg-text-content">@content</span>
-                                        }
-                                    </div>
-
-                                    <div class="msg-meta-row justify-content-end">
-                                        @if (msgId != null)
-                                        {
-                                            <button type="button"
-                                                    class="btn-reply-text js-reply-btn"
-                                                    data-id="@msgId"
-                                                    data-name="@(string.IsNullOrWhiteSpace(nickname) ? "Bạn" : nickname)"
-                                                    data-content="@content">
-                                                Trả lời
-                                            </button>
-                                        }
-                                        <div class="msg-time-chat">@(createdAt?.ToString("HH:mm") ?? "")</div>
-                                    </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="msg-group-other">
-                                    <img src="@avatar" class="avatar-chat-circle" onerror="this.src='https://i.pravatar.cc/150?img=3'" />
 
                                     <div class="msg-other-content">
-                                        <div class="nickname-chat">@nickname</div>
+                                        @if (!isMe)
+                                        {
+                                            <div class="nickname-chat">@nickname</div>
+                                        }
 
-                                        <div class="bubble-other">
-                                            @if (replyToCommentId != null && !string.IsNullOrWhiteSpace(replyToContent))
-                                            {
-                                                <div class="reply-quote">
-                                                    <div class="reply-quote-name">@replyToNickname</div>
-                                                    <div class="reply-quote-text">@SafePreview(replyToContent)</div>
-                                                </div>
-                                            }
+                                        <div class="bubble @(isMe ? "bubble-me" : "bubble-other")">
+                                            <div class="reaction-bar">
+                                                <span class="reaction-item" onclick="react('@msgId', '👍')">👍</span>
+                                                <span class="reaction-item" onclick="react('@msgId', '❤️')">❤️</span>
+                                                <span class="reaction-item" onclick="react('@msgId', '😂')">😂</span>
+                                                <span class="reaction-item" onclick="react('@msgId', '😮')">😮</span>
+                                            </div>
 
-                                            @if (IsSticker(content))
-                                            {
-                                                <div class="sticker-render">@RenderSticker(content)</div>
-                                            }
-                                            else
-                                            {
-                                                <span class="msg-text-content">@content</span>
-                                            }
+                                            @content
+
+                                            <div class="reaction-badge" id="react-@msgId"></div>
                                         </div>
 
-                                        <div class="msg-meta-row">
-                                            <div class="msg-time-chat">@(createdAt?.ToString("HH:mm") ?? "")</div>
-                                            @if (msgId != null)
-                                            {
-                                                <button type="button"
-                                                        class="btn-reply-text js-reply-btn"
-                                                        data-id="@msgId"
-                                                        data-name="@nickname"
-                                                        data-content="@content">
-                                                    Trả lời
-                                                </button>
-                                            }
+                                        <div class="msg-tools">
+                                            <span>@(time?.ToString("HH:mm"))</span>
+                                            <span class="btn-reply-action" onclick="setReply('@msgId', '@nickname', '@content')">Trả lời</span>
                                         </div>
                                     </div>
                                 </div>
-                            }
+                            </div>
                         }
                     }
                 </div>
 
                 <div class="chat-footer-form">
+                    <div id="replyBox" class="reply-preview-box">
+                        <div class="d-flex justify-content-between align-items-center small">
+                            <div class="text-truncate">Đang trả lời <strong>@Html.Raw("<span id='replyName'></span>")</strong>: <span id="replyText"></span></div>
+                            <button class="btn-close" style="font-size: 0.6rem;" onclick="cancelReply()"></button>
+                        </div>
+                    </div>
+
                     @if (!string.IsNullOrEmpty(currentUserEmail))
                     {
-                        <div id="replyPreviewBox" class="reply-preview-box">
-                            <div class="d-flex justify-content-between align-items-start gap-2">
-                                <div class="flex-grow-1 overflow-hidden">
-                                    <div class="reply-preview-title">Đang trả lời</div>
-                                    <div id="replyPreviewText" class="reply-preview-text"></div>
-                                </div>
-                                <button type="button" class="btn-cancel-reply" onclick="clearReply()">×</button>
-                            </div>
-                        </div>
-
-                        <div id="emojiPanel" class="emoji-panel">
-                            <div class="emoji-list">
-                                <button type="button" class="emoji-item" onclick="insertToMessage('😀')">😀</button>
-                                <button type="button" class="emoji-item" onclick="insertToMessage('😂')">😂</button>
-                                <button type="button" class="emoji-item" onclick="insertToMessage('😍')">😍</button>
-                                <button type="button" class="emoji-item" onclick="insertToMessage('🥰')">🥰</button>
-                                <button type="button" class="emoji-item" onclick="insertToMessage('😎')">😎</button>
-                                <button type="button" class="emoji-item" onclick="insertToMessage('😭')">😭</button>
-                                <button type="button" class="emoji-item" onclick="insertToMessage('👍')">👍</button>
-                                <button type="button" class="emoji-item" onclick="insertToMessage('❤️')">❤️</button>
-                            </div>
-                        </div>
-
-                        <div id="stickerPanel" class="sticker-panel">
-                            <div class="sticker-list">
-                                <button type="button" class="sticker-item" onclick="insertSticker('[sticker:like]')">👍</button>
-                                <button type="button" class="sticker-item" onclick="insertSticker('[sticker:love]')">❤️</button>
-                                <button type="button" class="sticker-item" onclick="insertSticker('[sticker:haha]')">😂</button>
-                                <button type="button" class="sticker-item" onclick="insertSticker('[sticker:wow]')">😮</button>
-                                <button type="button" class="sticker-item" onclick="insertSticker('[sticker:sad]')">😭</button>
-                                <button type="button" class="sticker-item" onclick="insertSticker('[sticker:angry]')">😡</button>
-                            </div>
-                        </div>
-
                         <form method="post" asp-action="AddComment" asp-route-id="@Model.Id">
-                            <input type="hidden" name="rating" value="0" />
                             <input type="hidden" name="replyToCommentId" id="replyToCommentId" />
-
                             <div class="chat-input-wrap">
-                                <button type="button" class="chat-tool-btn" onclick="toggleEmojiPanel()" title="Icon">
-                                    <i class="bi bi-emoji-smile"></i>
-                                </button>
-
-                                <button type="button" class="chat-tool-btn" onclick="toggleStickerPanel()" title="Sticker">
-                                    <i class="bi bi-stickies"></i>
-                                </button>
-
-                                <input name="content"
-                                       id="msgInput"
-                                       class="form-control chat-text-input"
-                                       placeholder="Nhập tin nhắn..."
-                                       required
-                                       autocomplete="off" />
-
+                                <input name="content" id="msgInput" class="form-control chat-text-input" placeholder="Aa" required autocomplete="off" />
                                 <button type="submit" class="send-btn-chat">
                                     <i class="bi bi-send-fill"></i>
                                 </button>
                             </div>
                         </form>
-                    }
-                    else
-                    {
-                        <div class="text-center py-2 fs-7">
-                            <a href="/Identity/Account/Login" class="text-teal text-decoration-none fw-bold">Đăng nhập</a>
-                            để tham gia thảo luận.
-                        </div>
                     }
                 </div>
             </div>
@@ -633,74 +319,34 @@
 </div>
 
 <script>
-    (function () {
-        const chatWindow = document.getElementById("chatWindow");
-        const replyInput = document.getElementById("replyToCommentId");
-        const previewBox = document.getElementById("replyPreviewBox");
-        const previewText = document.getElementById("replyPreviewText");
-        const msgInput = document.getElementById("msgInput");
-        const emojiPanel = document.getElementById("emojiPanel");
-        const stickerPanel = document.getElementById("stickerPanel");
+    const chatWindow = document.getElementById("chatWindow");
+    const replyInput = document.getElementById("replyToCommentId");
+    const replyBox = document.getElementById("replyBox");
+    const msgInput = document.getElementById("msgInput");
 
-        if (chatWindow) {
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+    if (chatWindow) {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function setReply(id, name, content) {
+        replyInput.value = id;
+        document.getElementById("replyName").innerText = name;
+        document.getElementById("replyText").innerText = content;
+        replyBox.classList.add("show");
+        msgInput.focus();
+    }
+
+    function cancelReply() {
+        replyInput.value = "";
+        replyBox.classList.remove("show");
+    }
+
+    function react(msgId, icon) {
+        const badge = document.getElementById("react-" + msgId);
+        if (badge) {
+            badge.innerText = icon;
+            badge.classList.add("active");
+            console.log("Reaction " + icon + " cho msg " + msgId);
         }
-
-        function normalizeText(text) {
-            if (!text) return "";
-            return text.replace(/\s+/g, " ").trim();
-        }
-
-        window.setReply = function (id, name, content) {
-            if (!replyInput || !previewBox || !previewText) return;
-
-            replyInput.value = id || "";
-            previewText.textContent = `${name}: ${normalizeText(content)}`;
-            previewBox.classList.add("show");
-
-            if (msgInput) msgInput.focus();
-        };
-
-        window.clearReply = function () {
-            if (!replyInput || !previewBox || !previewText) return;
-
-            replyInput.value = "";
-            previewText.textContent = "";
-            previewBox.classList.remove("show");
-        };
-
-        window.toggleEmojiPanel = function () {
-            if (!emojiPanel) return;
-            emojiPanel.classList.toggle("show");
-            if (stickerPanel) stickerPanel.classList.remove("show");
-        };
-
-        window.toggleStickerPanel = function () {
-            if (!stickerPanel) return;
-            stickerPanel.classList.toggle("show");
-            if (emojiPanel) emojiPanel.classList.remove("show");
-        };
-
-        window.insertToMessage = function (text) {
-            if (!msgInput) return;
-            msgInput.value = ((msgInput.value || "").trim() + " " + text).trim();
-            msgInput.focus();
-        };
-
-        window.insertSticker = function (text) {
-            if (!msgInput) return;
-            msgInput.value = text;
-            msgInput.focus();
-            if (stickerPanel) stickerPanel.classList.remove("show");
-        };
-
-        document.querySelectorAll(".js-reply-btn").forEach(btn => {
-            btn.addEventListener("click", function () {
-                const id = this.getAttribute("data-id");
-                const name = this.getAttribute("data-name");
-                const content = this.getAttribute("data-content");
-                setReply(id, name, content);
-            });
-        });
-    })();
+    }
 </script>

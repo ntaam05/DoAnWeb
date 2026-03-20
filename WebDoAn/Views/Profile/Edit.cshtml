@@ -1,110 +1,151 @@
 ﻿@model WebDoAn.Models.UserAccount
 @{
-    ViewData["Title"] = "Hồ sơ";
+    ViewData["Title"] = "Chỉnh sửa hồ sơ";
 }
 
-<h2 class="mb-3">Hồ sơ cá nhân (Người thuê)</h2>
-
-<form method="post" enctype="multipart/form-data" class="w-75">
-    @if (!string.IsNullOrEmpty(Model.AvatarUrl))
-    {
-        <img src="@Model.AvatarUrl" style="width:96px;height:96px;border-radius:50%;object-fit:cover" />
+<style>
+    .img-container {
+        max-height: 450px;
+        width: 100%;
     }
 
-    <div class="mb-3 mt-3">
-        <label>Avatar (tuỳ chọn)</label>
-        <input type="file" name="avatar" class="form-control" accept="image/*" />
-    </div>
+    #imageToCrop {
+        display: block;
+        max-width: 100%;
+    }
 
-    <div class="mb-3">
-        <label>Họ tên</label>
-        <input name="fullName" class="form-control" value="@Model.FullName" />
-    </div>
+    .btn-teal {
+        background-color: var(--primary-teal);
+        color: white;
+        border: none;
+    }
+</style>
 
-    <div class="mb-3">
-        <label>Năm sinh</label>
-        <input name="birthYear" class="form-control" value="@Model.BirthYear" />
-    </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                <h2 class="fw-bold text-teal mb-4"><i class="bi bi-pencil-square"></i> Cập nhật thông tin</h2>
 
-    <div class="mb-3">
-        <label>Giới tính</label>
-        <select name="gender" class="form-select">
-            <option value="">-- Chọn giới tính --</option>
-            <option value="Nam" selected="@(Model.Gender == "Nam")">Nam</option>
-            <option value="Nữ" selected="@(Model.Gender == "Nữ")">Nữ</option>
-            <option value="Khác" selected="@(Model.Gender == "Khác")">Khác</option>
-        </select>
-    </div>
+                <form method="post" id="profileForm">
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            <img id="avatarPreview" src="@(Model.AvatarUrl ?? "https://i.pravatar.cc/150?img=3")"
+                                 class="rounded-circle border" style="width:120px; height:120px; object-fit:cover" />
+                            <label for="avatarInput" class="btn btn-dark btn-sm rounded-circle position-absolute bottom-0 end-0">
+                                <i class="bi bi-camera"></i>
+                            </label>
+                        </div>
+                        <input type="file" id="avatarInput" class="d-none" accept="image/*" />
+                        <input type="hidden" name="croppedAvatar" id="croppedAvatarData" />
+                    </div>
 
-    <div class="mb-3">
-        <label>Quê quán</label>
-        <input name="hometown" class="form-control" list="hometown-list" value="@Model.Hometown" placeholder="Nhập để tìm nhanh..." />
-        <datalist id="hometown-list">
-            <option value="An Giang"></option>
-            <option value="Bà Rịa - Vũng Tàu"></option>
-            <option value="Bạc Liêu"></option>
-            <option value="Bắc Giang"></option>
-            <option value="Bắc Kạn"></option>
-            <option value="Bắc Ninh"></option>
-            <option value="Bến Tre"></option>
-            <option value="Bình Dương"></option>
-            <option value="Bình Định"></option>
-            <option value="Bình Phước"></option>
-            <option value="Bình Thuận"></option>
-            <option value="Cà Mau"></option>
-            <option value="Cần Thơ"></option>
-            <option value="Cao Bằng"></option>
-            <option value="Đà Nẵng"></option>
-            <option value="Đắk Lắk"></option>
-            <option value="Đắk Nông"></option>
-            <option value="Điện Biên"></option>
-            <option value="Đồng Nai"></option>
-            <option value="Đồng Tháp"></option>
-            <option value="Gia Lai"></option>
-            <option value="Hà Giang"></option>
-            <option value="Hà Nam"></option>
-            <option value="Hà Nội"></option>
-            <option value="Hà Tĩnh"></option>
-            <option value="Hải Dương"></option>
-            <option value="Hải Phòng"></option>
-            <option value="Hậu Giang"></option>
-            <option value="Hòa Bình"></option>
-            <option value="Hưng Yên"></option>
-            <option value="Khánh Hòa"></option>
-            <option value="Kiên Giang"></option>
-            <option value="Kon Tum"></option>
-            <option value="Lai Châu"></option>
-            <option value="Lâm Đồng"></option>
-            <option value="Lạng Sơn"></option>
-            <option value="Lào Cai"></option>
-            <option value="Long An"></option>
-            <option value="Nam Định"></option>
-            <option value="Nghệ An"></option>
-            <option value="Ninh Bình"></option>
-            <option value="Ninh Thuận"></option>
-            <option value="Phú Thọ"></option>
-            <option value="Phú Yên"></option>
-            <option value="Quảng Bình"></option>
-            <option value="Quảng Nam"></option>
-            <option value="Quảng Ngãi"></option>
-            <option value="Quảng Ninh"></option>
-            <option value="Quảng Trị"></option>
-            <option value="Sóc Trăng"></option>
-            <option value="Sơn La"></option>
-            <option value="Tây Ninh"></option>
-            <option value="Thái Bình"></option>
-            <option value="Thái Nguyên"></option>
-            <option value="Thanh Hóa"></option>
-            <option value="Thừa Thiên Huế"></option>
-            <option value="Tiền Giang"></option>
-            <option value="TP. Hồ Chí Minh"></option>
-            <option value="Trà Vinh"></option>
-            <option value="Tuyên Quang"></option>
-            <option value="Vĩnh Long"></option>
-            <option value="Vĩnh Phúc"></option>
-            <option value="Yên Bái"></option>
-        </datalist>
-    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Họ và tên (Biệt danh)</label>
+                        <input name="fullName" class="form-control rounded-pill bg-light border-0 px-4 py-2" value="@Model.FullName" required />
+                    </div>
 
-    <button class="btn btn-primary" type="submit">Lưu</button>
-</form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small">Năm sinh</label>
+                            <input name="birthYear" class="form-control rounded-pill bg-light border-0 px-4" value="@Model.BirthYear" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small">Giới tính</label>
+                            <select name="gender" class="form-select rounded-pill bg-light border-0 px-4">
+                                <option value="Nam" selected="@(Model.Gender == "Nam")">Nam</option>
+                                <option value="Nữ" selected="@(Model.Gender == "Nữ")">Nữ</option>
+                                <option value="Khác" selected="@(Model.Gender == "Khác")">Khác</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-teal w-100 py-3 rounded-pill fw-bold shadow-sm mt-3">LƯU THAY ĐỔI</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cropperModal" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="fw-bold">Cắt ảnh đại diện 1:1</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="img-container bg-light">
+                    <img id="imageToCrop" src="">
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-teal rounded-pill px-4" id="cropButton">Cắt và Sử dụng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let cropper;
+        const avatarInput = document.getElementById('avatarInput');
+        const imageToCrop = document.getElementById('imageToCrop');
+        const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'));
+
+        // Khi người dùng chọn file
+        avatarInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    imageToCrop.src = reader.result;
+                    cropperModal.show();
+                };
+                reader.readAsDataURL(files[0]);
+            }
+        });
+
+        // Khởi tạo Cropper khi Modal hiện lên
+        document.getElementById('cropperModal').addEventListener('shown.bs.modal', function () {
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: 1, // Bắt buộc khung vuông 1:1
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: false, // Giữ cố định tỉ lệ
+                toggleDragModeOnDblclick: false,
+            });
+        });
+
+        // Hủy cropper khi đóng modal để tránh rác bộ nhớ
+        document.getElementById('cropperModal').addEventListener('hidden.bs.modal', function () {
+            if(cropper) {
+                cropper.destroy();
+            }
+        });
+
+        // Khi nhấn nút "Cắt và Sử dụng"
+        document.getElementById('cropButton').onclick = function() {
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+            });
+
+            // Chuyển kết quả thành chuỗi Base64
+            const base64Image = canvas.toDataURL('image/jpeg');
+
+            // Hiển thị xem trước và gán vào input ẩn
+            document.getElementById('avatarPreview').src = base64Image;
+            document.getElementById('croppedAvatarData').value = base64Image;
+
+            cropperModal.hide();
+        };
+    </script>
+}

@@ -102,6 +102,7 @@ namespace WebDoAn.Areas.Identity.Pages.Account
                 HttpContext.Session.SetString("CURRENT_USER_TYPE", user.UserType);
                 HttpContext.Session.SetString("CURRENT_USER_NAME", user.FullName ?? "");
                 HttpContext.Session.SetString("CURRENT_USER_AVATAR", user.AvatarUrl ?? "");
+                TempData["LoginWelcome"] = string.IsNullOrWhiteSpace(user.FullName) ? user.Email.Split('@')[0] : user.FullName;
 
                 // Save email cookie if Remember Me checked
                 if (Input.RememberMe)

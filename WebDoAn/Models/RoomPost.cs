@@ -33,4 +33,5 @@ public class RoomPost
     public string JoinCode { get; set; } = "";
     public string? MapLink { get; set; }
     public string? Hashtags { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

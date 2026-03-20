@@ -295,7 +295,10 @@ namespace WebDoAn.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Rating")
+                    b.Property<int?>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplyToCommentId")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomPostId")

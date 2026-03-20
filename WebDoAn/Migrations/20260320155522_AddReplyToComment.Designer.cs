@@ -12,8 +12,8 @@ using WebDoAn.Data;
 namespace WebDoAn.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260320084447_AddMapAndHashtag")]
-    partial class AddMapAndHashtag
+    [Migration("20260320155522_AddReplyToComment")]
+    partial class AddReplyToComment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -283,6 +283,41 @@ namespace WebDoAn.Migrations
                     b.ToTable("Likes");
                 });
 
+            modelBuilder.Entity("WebDoAn.Models.RoomComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplyToCommentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoomPostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomPostId");
+
+                    b.ToTable("RoomComments");
+                });
+
             modelBuilder.Entity("WebDoAn.Models.RoomPost", b =>
                 {
                     b.Property<int>("Id")
@@ -290,6 +325,9 @@ namespace WebDoAn.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -482,6 +520,17 @@ namespace WebDoAn.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("WebDoAn.Models.RoomComment", b =>
+                {
+                    b.HasOne("WebDoAn.Models.RoomPost", "RoomPost")
+                        .WithMany()
+                        .HasForeignKey("RoomPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RoomPost");
                 });
 
             modelBuilder.Entity("WebDoAn.Models.RoomTenant", b =>

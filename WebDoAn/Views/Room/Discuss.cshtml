@@ -1,103 +1,231 @@
 ﻿@model WebDoAn.Models.RoomPost
 @using Microsoft.AspNetCore.Http
+@using System.Reflection
+
 @{
     ViewData["Title"] = "Thảo luận";
     var currentUserEmail = Context.Session.GetString("CURRENT_USER_EMAIL");
-    var chatMessages = ViewBag.Comments; // Dữ liệu Nickname và Avatar được lấy từ Controller đã fix
+    var chatMessages = ViewBag.Comments;
+}
+
+@functions {
+    public object GetProp(object obj, string propName)
+    {
+        if (obj == null) return null;
+        var prop = obj.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        return prop?.GetValue(obj);
+    }
+    public string GetPropString(object obj, string propName) => GetProp(obj, propName)?.ToString() ?? "";
+    public int? GetPropInt(object obj, string propName)
+    {
+        var val = GetProp(obj, propName);
+        if (val == null) return null;
+        return (val is int i) ? i : (int.TryParse(val.ToString(), out var result) ? result : null);
+    }
+    public DateTime? GetPropDate(object obj, string propName)
+    {
+        var val = GetProp(obj, propName);
+        if (val == null) return null;
+        return (val is DateTime dt) ? dt : (DateTime.TryParse(val.ToString(), out var result) ? result : null);
+    }
 }
 
 <style>
     :root {
         --primary-teal: #009688;
-        --chat-bg: #f4f6f9;
-        --msg-teal: #00a095;
+        --chat-bg: #f8f9fa;
+        --msg-teal: #14a298;
+        --reply-border: #00bcd4;
+    }
+
+    .chat-container-main {
+        display: flex;
+        flex-direction: column;
+        height: 550px;
+        background-color: var(--chat-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #eee;
     }
 
     .chat-window {
-        height: 550px;
+        flex-grow: 1;
         overflow-y: auto;
-        background-color: var(--chat-bg);
-        padding: 25px;
-        border-radius: 12px;
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 15px;
-    }
-
-    /* VÒNG TRÒN NHỎ CỦA AVATAR CHAT */
-    .avatar-chat-circle {
-        width: 35px !important;
-        height: 35px !important;
-        min-width: 35px !important; /* Khóa chiều ngang không cho giãn */
-        max-width: 35px !important;
-        border-radius: 50% !important; /* Tạo vòng tròn */
-        object-fit: cover !important; /* Giữ tỉ lệ ảnh không bị móp */
-        flex-shrink: 0; /* Quan trọng: Ngăn Flexbox kéo giãn ảnh */
-        border: 1px solid #e0e0e0;
-        margin-right: 12px;
-        margin-top: 5px;
-    }
-
-    /* Đảm bảo group chứa avatar không kéo giãn nội dung bên trong */
-    .msg-group-other {
-        display: flex;
-        align-items: flex-start;
-        max-width: 85%;
-        margin-bottom: 10px;
-    }
-
-    .msg-other-content {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .nickname-chat {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #65676b;
-        margin-left: 12px;
-        margin-bottom: 2px;
-    }
-
-    .bubble-other {
-        background: white;
-        color: #050505;
-        padding: 10px 16px;
-        border-radius: 18px;
-        border-top-left-radius: 4px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-
-    /* Tin nhắn của mình (Right) */
-    .msg-group-me {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        margin-left: auto;
-        max-width: 80%;
-    }
-
-    .bubble-me {
-        background-color: var(--msg-teal);
-        color: white;
-        padding: 10px 16px;
-        border-radius: 18px;
-        border-bottom-right-radius: 4px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-
-    .msg-time-chat {
-        font-size: 0.65rem;
-        color: #8a8d91;
-        margin-top: 4px;
-        padding: 0 5px;
+        gap: 10px;
     }
 
     .chat-footer-form {
         background: white;
         padding: 15px;
-        border-top: 1px solid #e4e6eb;
-        border-radius: 0 0 12px 12px;
+        border-top: 1px solid #eee;
+        position: relative;
+    }
+
+    .avatar-chat-circle {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        flex-shrink: 0 !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        margin-right: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .msg-group {
+        display: flex;
+        max-width: 85%;
+        position: relative;
+        margin-bottom: 8px;
+    }
+
+    .msg-group-me {
+        margin-left: auto;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .msg-other-wrapper {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    /* FIX BUBBLE: Thêm min-width và margin-bottom để không bị che icon */
+    .bubble {
+        padding: 10px 16px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        width: fit-content !important;
+        min-width: 65px !important; /* Đảm bảo đủ chỗ cho icon */
+        margin-bottom: 12px; /* Tạo khoảng trống cho badge trồi xuống */
+    }
+
+    .bubble-other {
+        background: white;
+        color: #050505;
+        border-bottom-left-radius: 4px;
+    }
+
+    .bubble-me {
+        background-color: var(--msg-teal);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    /* REACTION BADGE: Nổi bật hơn, chống bị che */
+    .reaction-badge {
+        position: absolute;
+        bottom: -12px;
+        right: 8px;
+        background: white;
+        border-radius: 15px;
+        padding: 2px 5px;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        display: none;
+        z-index: 10;
+        border: 1px solid #f0f0f0;
+        line-height: 1;
+    }
+
+        .reaction-badge.active {
+            display: block;
+        }
+
+    .msg-group-me .reaction-badge {
+        right: auto;
+        left: 8px;
+    }
+
+    /* REACTION BAR (THANH CHỌN EMOJI) */
+    .reaction-bar {
+        position: absolute;
+        top: -42px;
+        background: white;
+        border-radius: 25px;
+        padding: 5px 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        display: none;
+        gap: 12px;
+        z-index: 100;
+        border: 1px solid #eee;
+    }
+
+    .msg-group:hover .reaction-bar {
+        display: flex;
+    }
+
+    .reaction-item {
+        cursor: pointer;
+        transition: transform 0.2s;
+        font-size: 1.3rem;
+    }
+
+        .reaction-item:hover {
+            transform: scale(1.5);
+        }
+
+    .msg-tools {
+        display: flex;
+        gap: 10px;
+        margin-top: -5px;
+        font-size: 0.68rem;
+        color: #8a8d91;
+        padding: 0 5px;
+    }
+
+    .btn-reply-action {
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+        .btn-reply-action:hover {
+            color: var(--primary-teal);
+        }
+
+    .reply-preview-box {
+        display: none;
+        background: #f0f2f5;
+        padding: 8px 12px;
+        border-left: 4px solid var(--primary-teal);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+        .reply-preview-box.show {
+            display: block;
+        }
+
+    .chat-input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f0f2f5;
+        border-radius: 20px;
+        padding: 5px 15px;
+    }
+
+    .chat-text-input {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .send-btn-chat {
+        background: var(--primary-teal);
+        color: white;
+        border: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>
 
@@ -105,72 +233,84 @@
     <div class="row g-4">
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 20px;">
-                <h5 class="fw-bold mb-3" style="color: var(--primary-teal);"><i class="bi bi-info-circle-fill"></i> Thông tin bài đăng</h5>
+                <h5 class="fw-bold mb-3" style="color: var(--primary-teal);"><i class="bi bi-info-circle-fill"></i> Thông tin thảo luận</h5>
                 <h4 class="fw-bold">@Model.Title</h4>
-                <p class="text-secondary mt-3 small">@Model.Description</p>
-                <hr class="border-secondary op-20">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-person-circle"></i>
-                    <span class="small text-muted">Bởi: <strong>@Model.OwnerId.Split('@')[0]</strong></span>
-                </div>
+                <p class="text-secondary small">@Model.Description</p>
+                <hr>
+                <div class="small text-muted">Bởi: <strong>@Model.OwnerId.Split('@')[0]</strong></div>
             </div>
         </div>
 
         <div class="col-lg-8">
-            <div class="card border-0 shadow rounded-4 overflow-hidden">
+            <div class="chat-container-main bg-white shadow-sm">
                 <div class="chat-window" id="chatWindow">
-                    @if (chatMessages == null || chatMessages.Count == 0)
-                    {
-                        <div class="text-center my-auto opacity-50">
-                            <i class="bi bi-chat-left-text fs-1"></i>
-                            <p class="mt-2">Hãy gửi tin nhắn đầu tiên để bắt đầu cuộc thảo luận!</p>
-                        </div>
-                    }
-                    else
+                    @if (chatMessages != null)
                     {
                         foreach (var msg in chatMessages)
                         {
-                            bool isMe = (msg.UserEmail == currentUserEmail);
+                            var email = GetPropString(msg, "UserEmail");
+                            var nickname = GetPropString(msg, "Nickname");
+                            var content = GetPropString(msg, "Content");
+                            var time = GetPropDate(msg, "CreatedAt");
+                            var msgId = GetPropInt(msg, "Id");
+                            bool isMe = (email == currentUserEmail);
 
-                            if (isMe)
-                            {
-                                <div class="msg-group-me">
-                                    <div class="bubble-me">@msg.Content</div>
-                                    <div class="msg-time-chat">@msg.CreatedAt.ToString("HH:mm")</div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="msg-group-other">
-                                    <img src="@msg.Avatar" class="avatar-chat-circle" onerror="this.src='https://i.pravatar.cc/150?img=3'" />
+                            <div class="msg-group @(isMe ? "msg-group-me" : "msg-group-other")" data-id="@msgId">
+                                <div class="msg-other-wrapper">
+                                    @if (!isMe)
+                                    {
+                                        <img src="@GetPropString(msg, "Avatar")" class="avatar-chat-circle" onerror="this.src='https://i.pravatar.cc/150?img=3'" />
+                                    }
 
                                     <div class="msg-other-content">
-                                        <div class="nickname-chat">@msg.Nickname</div>
-                                        <div class="bubble-other">@msg.Content</div>
-                                        <div class="msg-time-chat text-start">@msg.CreatedAt.ToString("HH:mm")</div>
+                                        @if (!isMe)
+                                        {
+                                            <div class="nickname-chat">@nickname</div>
+                                        }
+
+                                        <div class="bubble @(isMe ? "bubble-me" : "bubble-other")">
+                                            <div class="reaction-bar">
+                                                <span class="reaction-item" onclick="react('@msgId', '👍')">👍</span>
+                                                <span class="reaction-item" onclick="react('@msgId', '❤️')">❤️</span>
+                                                <span class="reaction-item" onclick="react('@msgId', '😂')">😂</span>
+                                                <span class="reaction-item" onclick="react('@msgId', '😮')">😮</span>
+                                            </div>
+
+                                            @content
+
+                                            <div class="reaction-badge" id="react-@msgId"></div>
+                                        </div>
+
+                                        <div class="msg-tools">
+                                            <span>@(time?.ToString("HH:mm"))</span>
+                                            <span class="btn-reply-action" onclick="setReply('@msgId', '@nickname', '@content')">Trả lời</span>
+                                        </div>
                                     </div>
                                 </div>
-                            }
+                            </div>
                         }
                     }
                 </div>
 
                 <div class="chat-footer-form">
+                    <div id="replyBox" class="reply-preview-box">
+                        <div class="d-flex justify-content-between align-items-center small">
+                            <div class="text-truncate">Đang trả lời <strong>@Html.Raw("<span id='replyName'></span>")</strong>: <span id="replyText"></span></div>
+                            <button class="btn-close" style="font-size: 0.6rem;" onclick="cancelReply()"></button>
+                        </div>
+                    </div>
+
                     @if (!string.IsNullOrEmpty(currentUserEmail))
                     {
-                        <form method="post" asp-action="AddComment" asp-route-id="@Model.Id" class="d-flex gap-2 align-items-center">
-                            <input type="hidden" name="rating" value="5" />
-                            <input name="content" id="msgInput" class="form-control rounded-pill border-0 bg-light px-4 py-2" placeholder="Aa" required autocomplete="off" />
-                            <button type="submit" class="btn rounded-circle d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background-color: var(--primary-teal); color:white;">
-                                <i class="bi bi-send-fill"></i>
-                            </button>
+                        <form method="post" asp-action="AddComment" asp-route-id="@Model.Id">
+                            <input type="hidden" name="replyToCommentId" id="replyToCommentId" />
+                            <div class="chat-input-wrap">
+                                <input name="content" id="msgInput" class="form-control chat-text-input" placeholder="Aa" required autocomplete="off" />
+                                <button type="submit" class="send-btn-chat">
+                                    <i class="bi bi-send-fill"></i>
+                                </button>
+                            </div>
                         </form>
-                    }
-                    else
-                    {
-                        <div class="text-center py-2 fs-7">
-                            <a href="/Identity/Account/Login" class="text-teal text-decoration-none fw-bold">Đăng nhập</a> để tham gia thảo luận.
-                        </div>
                     }
                 </div>
             </div>
@@ -179,7 +319,34 @@
 </div>
 
 <script>
-    // Luôn tự động cuộn xuống tin nhắn cuối cùng khi tải trang
     const chatWindow = document.getElementById("chatWindow");
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    const replyInput = document.getElementById("replyToCommentId");
+    const replyBox = document.getElementById("replyBox");
+    const msgInput = document.getElementById("msgInput");
+
+    if (chatWindow) {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function setReply(id, name, content) {
+        replyInput.value = id;
+        document.getElementById("replyName").innerText = name;
+        document.getElementById("replyText").innerText = content;
+        replyBox.classList.add("show");
+        msgInput.focus();
+    }
+
+    function cancelReply() {
+        replyInput.value = "";
+        replyBox.classList.remove("show");
+    }
+
+    function react(msgId, icon) {
+        const badge = document.getElementById("react-" + msgId);
+        if (badge) {
+            badge.innerText = icon;
+            badge.classList.add("active");
+            console.log("Reaction " + icon + " cho msg " + msgId);
+        }
+    }
 </script>

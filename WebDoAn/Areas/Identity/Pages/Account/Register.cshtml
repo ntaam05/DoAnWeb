@@ -39,28 +39,44 @@
                             <span asp-validation-for="Input.UserType" class="text-danger small"></span>
                         </div>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6 form-floating">
-                                <input asp-for="Input.Email" class="form-control focus-teal" autocomplete="username" placeholder="name@example.com" />
-                                <label asp-for="Input.Email" class="text-muted">Địa chỉ Email</label>
-                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        <div class="mb-3">
+                            <label asp-for="Input.Email" class="form-label fw-semibold text-muted"></label>
+                            <div class="d-flex gap-2">
+                                <input asp-for="Input.Email" id="registerEmail" class="form-control focus-teal" autocomplete="username" placeholder="name@example.com" />
+                                <button type="button" class="btn btn-outline-primary" id="sendCodeBtn" onclick="sendEmailCode()">
+                                    Confirm Email
+                                </button>
                             </div>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
 
+                        <div class="mb-3">
+                            <label asp-for="Input.EmailCode" class="form-label fw-semibold text-muted"></label>
+                            <div class="d-flex gap-2">
+                                <input asp-for="Input.EmailCode" id="emailCodeInput" class="form-control focus-teal" placeholder="Nhập mã 6 số" />
+                                <button type="button" class="btn btn-success" id="verifyCodeBtn" onclick="verifyEmailCode()">
+                                    Xác nhận mã
+                                </button>
+                            </div>
+                            <div id="emailVerifyMessage" class="small mt-2"></div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6 form-floating">
                                 <input asp-for="Input.FullName" class="form-control focus-teal" placeholder="Họ và tên" />
                                 <label asp-for="Input.FullName" class="text-muted">Họ tên</label>
                                 <span asp-validation-for="Input.FullName" class="text-danger small"></span>
                             </div>
-                        </div>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-4 form-floating">
+                            <div class="col-md-6 form-floating">
                                 <input asp-for="Input.BirthYear" class="form-control focus-teal" placeholder="1990" />
                                 <label asp-for="Input.BirthYear" class="text-muted">Năm sinh</label>
                                 <span asp-validation-for="Input.BirthYear" class="text-danger small"></span>
                             </div>
+                        </div>
 
-                            <div class="col-md-4 form-floating">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 form-floating">
                                 <select asp-for="Input.Gender" class="form-select focus-teal">
                                     <option value="">-- Chọn giới tính --</option>
                                     <option value="Nam">Nam</option>
@@ -71,9 +87,11 @@
                                 <span asp-validation-for="Input.Gender" class="text-danger small"></span>
                             </div>
 
-                            <div class="col-md-4 form-floating">
-                                <input asp-for="Input.Hometown" class="form-control focus-teal" placeholder="Quê quán" />
-                                <label asp-for="Input.Hometown" class="text-muted">Quê quán</label>
+                            <div class="col-md-6 form-floating">
+                                <select asp-for="Input.Hometown" asp-items="Model.ProvinceOptions" class="form-select focus-teal">
+                                    <option value="">-- Chọn tỉnh/thành --</option>
+                                </select>
+                                <label asp-for="Input.Hometown" class="text-muted"></label>
                                 <span asp-validation-for="Input.Hometown" class="text-danger small"></span>
                             </div>
                         </div>
@@ -194,7 +212,6 @@
                 function updateSelectedState() {
                     options.forEach(function (option) {
                         option.classList.remove('active');
-
                         var radio = option.querySelector('.user-type-radio');
                         if (radio && radio.checked) {
                             option.classList.add('active');
@@ -219,9 +236,144 @@
                 updateSelectedState();
             }
 
+            function getAntiForgeryToken() {
+                var tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                return tokenInput ? tokenInput.value : "";
+            }
+
+            function setMessage(text, isSuccess) {
+                const msg = document.getElementById("emailVerifyMessage");
+                if (!msg) return;
+                msg.innerText = text || "";
+                msg.className = isSuccess ? "text-success small mt-2 fw-semibold" : "text-danger small mt-2 fw-semibold";
+            }
+
+            window.sendEmailCode = async function () {
+                const emailInput = document.getElementById("registerEmail");
+                const btn = document.getElementById("sendCodeBtn");
+
+                if (!emailInput || !btn) return;
+
+                const email = emailInput.value.trim();
+                if (!email) {
+                    setMessage("Vui lòng nhập email trước.", false);
+                    emailInput.focus();
+                    return;
+                }
+
+                const oldText = btn.innerHTML;
+                btn.disabled = true;
+                btn.classList.remove("btn-outline-primary");
+                btn.classList.add("btn-secondary");
+                btn.innerHTML = "Đang gửi...";
+
+                try {
+                    const formData = new FormData();
+                    formData.append("email", email);
+                    formData.append("__RequestVerificationToken", getAntiForgeryToken());
+
+                    const res = await fetch("?handler=SendEmailCode", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    setMessage(data.message, data.success);
+
+                    if (data.success) {
+                        btn.classList.remove("btn-secondary", "btn-outline-primary");
+                        btn.classList.add("btn-warning");
+                        btn.innerHTML = "Đã gửi mã";
+                    } else {
+                        btn.classList.remove("btn-secondary");
+                        btn.classList.add("btn-outline-primary");
+                        btn.innerHTML = oldText;
+                    }
+                } catch {
+                    setMessage("Lỗi kết nối khi gửi mã.", false);
+                    btn.classList.remove("btn-secondary");
+                    btn.classList.add("btn-outline-primary");
+                    btn.innerHTML = oldText;
+                } finally {
+                    btn.disabled = false;
+                }
+            };
+
+            window.verifyEmailCode = async function () {
+                const emailInput = document.getElementById("registerEmail");
+                const codeInput = document.getElementById("emailCodeInput");
+                const btn = document.getElementById("verifyCodeBtn");
+                const sendBtn = document.getElementById("sendCodeBtn");
+
+                if (!emailInput || !codeInput || !btn) return;
+
+                const email = emailInput.value.trim();
+                const code = codeInput.value.trim();
+
+                if (!email) {
+                    setMessage("Vui lòng nhập email trước.", false);
+                    emailInput.focus();
+                    return;
+                }
+
+                if (!code) {
+                    setMessage("Vui lòng nhập mã xác thực.", false);
+                    codeInput.focus();
+                    return;
+                }
+
+                const oldText = btn.innerHTML;
+                btn.disabled = true;
+                btn.classList.remove("btn-success");
+                btn.classList.add("btn-secondary");
+                btn.innerHTML = "Đang kiểm tra...";
+
+                try {
+                    const formData = new FormData();
+                    formData.append("email", email);
+                    formData.append("code", code);
+                    formData.append("__RequestVerificationToken", getAntiForgeryToken());
+
+                    const res = await fetch("?handler=VerifyEmailCode", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    setMessage(data.message, data.success);
+
+                    if (data.success) {
+                        btn.classList.remove("btn-secondary", "btn-success");
+                        btn.classList.add("btn-primary");
+                        btn.innerHTML = "Đã xác thực";
+                        btn.disabled = true;
+
+                        if (sendBtn) {
+                            sendBtn.classList.remove("btn-warning", "btn-outline-primary", "btn-secondary");
+                            sendBtn.classList.add("btn-success");
+                            sendBtn.innerHTML = "Email đã xác thực";
+                            sendBtn.disabled = true;
+                        }
+
+                        emailInput.readOnly = true;
+                        codeInput.readOnly = true;
+                    } else {
+                        btn.classList.remove("btn-secondary");
+                        btn.classList.add("btn-success");
+                        btn.innerHTML = oldText;
+                    }
+                } catch {
+                    setMessage("Lỗi kết nối khi xác thực mã.", false);
+                    btn.classList.remove("btn-secondary");
+                    btn.classList.add("btn-success");
+                    btn.innerHTML = oldText;
+                }
+            };
+
             togglePassword('toggleRegisterPassword', 'registerPassword', 'registerToggleIcon');
             togglePassword('toggleRegisterConfirmPassword', 'registerConfirmPassword', 'registerConfirmToggleIcon');
             initUserTypeSelection();
         })();
     </script>
+}
 }

@@ -6,7 +6,9 @@
     var type = Context.Session.GetString("CURRENT_USER_TYPE");
     var comments = ViewBag.Comments as List<WebDoAn.Models.RoomComment>;
     double avg = ViewBag.AvgRate ?? 0.0;
+    int ratingCount = ViewBag.RatingCount ?? 0;
     bool isSaved = ViewBag.IsSaved != null && (bool)ViewBag.IsSaved;
+    bool hasReviewed = ViewBag.HasReviewed != null && (bool)ViewBag.HasReviewed;
 
     var images = (Model.ImageUrls != null && Model.ImageUrls.Any())
         ? Model.ImageUrls
@@ -101,7 +103,7 @@
         </div>
 
         <div class="mt-3 mb-3 fs-5">
-            ⭐ <b>@avg</b> / 5 Đánh giá
+            ⭐ <b>@avg</b> / 5 Đánh giá <span class="text-muted">(@ratingCount lượt)</span>
         </div>
 
         @if (!string.IsNullOrEmpty(email))
@@ -127,24 +129,37 @@
 <hr class="my-5" />
 
 <h4>Bình luận & Đánh giá</h4>
+
+@if (TempData["AuthError"] != null)
+{
+    <div class="alert alert-warning">@TempData["AuthError"]</div>
+}
+
 @if (email != null && type == "Tenant")
 {
-    <form method="post" asp-action="AddComment" asp-route-id="@Model.Id" class="mb-4">
-        <div class="mb-2">
-            <textarea name="content" class="form-control focus-teal" placeholder="Nhận xét trải nghiệm của bạn..." required></textarea>
-        </div>
-        <div class="mb-2">
-            <select name="rating" class="form-select focus-teal" required>
-                <option value="">Chọn số sao</option>
-                <option value="5">⭐⭐⭐⭐⭐ - Rất tốt</option>
-                <option value="4">⭐⭐⭐⭐ - Tốt</option>
-                <option value="3">⭐⭐⭐ - Bình thường</option>
-                <option value="2">⭐⭐ - Tệ</option>
-                <option value="1">⭐ - Rất tệ</option>
-            </select>
-        </div>
-        <button class="btn text-white fw-bold px-4" style="background-color: var(--primary-teal);">Gửi đánh giá</button>
-    </form>
+    @if (!hasReviewed)
+    {
+        <form method="post" asp-action="AddComment" asp-route-id="@Model.Id" class="mb-4">
+            <div class="mb-2">
+                <textarea name="content" class="form-control focus-teal" placeholder="Nhận xét trải nghiệm của bạn..." required></textarea>
+            </div>
+            <div class="mb-2">
+                <select name="rating" class="form-select focus-teal" required>
+                    <option value="">Chọn số sao</option>
+                    <option value="5">⭐⭐⭐⭐⭐ - Rất tốt</option>
+                    <option value="4">⭐⭐⭐⭐ - Tốt</option>
+                    <option value="3">⭐⭐⭐ - Bình thường</option>
+                    <option value="2">⭐⭐ - Tệ</option>
+                    <option value="1">⭐ - Rất tệ</option>
+                </select>
+            </div>
+            <button class="btn text-white fw-bold px-4" style="background-color: var(--primary-teal);">Gửi đánh giá</button>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-info">Bạn đã đánh giá phòng này rồi. Mỗi email chỉ được đánh giá 1 lần.</div>
+    }
 }
 
 @if (comments != null && comments.Count > 0)

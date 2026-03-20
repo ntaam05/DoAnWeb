@@ -1,56 +1,124 @@
 ﻿@model List<WebDoAn.Models.RoomPost>
 
 @{
-    ViewData["Title"] = "My Rooms";
+    ViewData["Title"] = "Quản lý phòng của tôi";
 }
 
-<h2 class="mb-4">My Rooms</h2>
+<style>
+    .room-card {
+        transition: all 0.3s ease;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
 
-<div class="row">
-    @foreach (var room in Model)
-    {
-        var hasTenant = room.Tenants != null && room.Tenants.Any();
-        var imageUrl = room.ImageUrls?.FirstOrDefault();
-
-        if (string.IsNullOrWhiteSpace(imageUrl))
-        {
-            imageUrl = "https://picsum.photos/seed/defaultroom/800/500";
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,150,136,0.15) !important;
         }
 
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <img src="@imageUrl"
-                     class="card-img-top"
-                     style="height:220px;object-fit:cover;"
-                     alt="Ảnh phòng"
-                     onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/800/500';" />
+    .price-tag {
+        color: #e53935;
+        font-weight: 800;
+        font-size: 1.25rem;
+    }
 
-                <div class="card-body">
-                    <h4>@room.Title</h4>
-                    <p class="text-primary fw-bold">@String.Format("{0:N0}", room.Price) đ/tháng</p>
+    .btn-teal {
+        background-color: var(--primary-teal);
+        color: white;
+    }
 
-                    @if (hasTenant)
-                    {
-                        <span class="badge bg-success">Đã thuê</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning text-dark">Chưa thuê</span>
-                    }
-                </div>
+        .btn-teal:hover {
+            background-color: var(--primary-teal-hover);
+            color: white;
+        }
+</style>
 
-                <div class="card-footer bg-white">
-                    <div class="d-flex justify-content-between mb-2">
-                        <a asp-action="Detail" asp-route-id="@room.Id" class="btn btn-outline-primary">Xem chi tiết</a>
-                        <a asp-action="Manage" asp-route-id="@room.Id" class="btn btn-outline-dark">Quản lý</a>
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h2 class="fw-bold text-teal m-0">
+            <i class="bi bi-houses-fill me-2"></i>Phòng Của Tôi
+        </h2>
+        <a asp-action="Create" class="btn btn-teal fw-bold rounded-pill px-4 py-2 shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Đăng phòng mới
+        </a>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert bg-white border-0 shadow-sm text-center py-5 rounded-4 mt-4">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+            <h5 class="text-muted">Bạn chưa đăng bài cho thuê phòng nào.</h5>
+            <p class="text-muted small">Hãy nhấn nút "Đăng phòng mới" để bắt đầu tìm kiếm người thuê nhé!</p>
+            <a asp-action="Create" class="btn btn-outline-teal mt-2 rounded-pill px-4">Đăng phòng ngay</a>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var room in Model)
+            {
+                var hasTenant = room.Tenants != null && room.Tenants.Any();
+                var imageUrl = room.ImageUrls?.FirstOrDefault();
+
+                if (string.IsNullOrWhiteSpace(imageUrl))
+                {
+                    imageUrl = "https://picsum.photos/seed/defaultroom/800/500";
+                }
+
+                <div class="col">
+                    <div class="card h-100 room-card shadow-sm bg-white">
+
+                        <div class="position-relative">
+                            <img src="@imageUrl"
+                                 class="card-img-top w-100"
+                                 style="height: 220px; object-fit: cover;"
+                                 alt="Ảnh phòng"
+                                 onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/800/500';" />
+
+                            @if (hasTenant)
+                            {
+                                <span class="badge bg-success position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Đã cho thuê
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                                    <i class="bi bi-door-open-fill me-1"></i> Đang trống
+                                </span>
+                            }
+                        </div>
+
+                        <div class="card-body p-4 pb-2">
+                            <h5 class="card-title text-dark fw-bold text-truncate mb-2" title="@room.Title">
+                                @room.Title
+                            </h5>
+                            <div class="price-tag mb-3">
+                                @String.Format("{0:N0} đ", room.Price) <span class="fs-6 text-muted fw-normal">/tháng</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
+                            <div class="d-flex justify-content-between mb-2 gap-2">
+                                <a asp-action="Detail" asp-route-id="@room.Id" class="btn btn-outline-secondary btn-sm flex-fill rounded-pill fw-semibold">
+                                    <i class="bi bi-eye"></i> Xem tin
+                                </a>
+                                <a asp-action="Manage" asp-route-id="@room.Id" class="btn btn-teal btn-sm flex-fill rounded-pill fw-semibold">
+                                    <i class="bi bi-gear"></i> Quản lý
+                                </a>
+                            </div>
+
+                            <form asp-action="DeleteRoom" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phòng này không? Mọi dữ liệu người thuê trong phòng cũng sẽ bị xóa.');">
+                                <input type="hidden" name="id" value="@room.Id" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill fw-semibold">
+                                    <i class="bi bi-trash3"></i> Xóa phòng
+                                </button>
+                            </form>
+                        </div>
                     </div>
-
-                    <form asp-action="DeleteRoom" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa phòng này không?');">
-                        <input type="hidden" name="id" value="@room.Id" />
-                        <button type="submit" class="btn btn-danger w-100">Xóa phòng</button>
-                    </form>
                 </div>
-            </div>
+            }
         </div>
     }
 </div>

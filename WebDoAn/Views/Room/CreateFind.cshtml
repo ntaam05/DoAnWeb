@@ -3,19 +3,59 @@
     ViewData["Title"] = "Đăng bài tìm người";
 }
 
-<h2 class="mb-3">Đăng Bài Tìm Người Ở Ghép</h2>
+<style>
+    .focus-teal:focus {
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
+    }
 
-<form method="post" class="w-75">
-    <div class="mb-3">
-        <label class="form-label">Tiêu đề</label>
-        <input name="Title" class="form-control" value="@Model.Title" required />
+    .btn-teal {
+        background-color: var(--primary-teal);
+        color: white;
+        border: none;
+    }
+
+        .btn-teal:hover {
+            background-color: var(--primary-teal-hover);
+            color: white;
+        }
+
+    .text-teal {
+        color: var(--primary-teal);
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-person-hearts fs-1 text-teal"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Đăng Bài Tìm Người Ở Ghép</h3>
+                    <p class="text-muted small">Hãy mô tả chi tiết về bản thân và mong muốn của bạn để tìm được người ghép phù hợp nhất nhé!</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5 pt-3">
+                    <form method="post">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Tiêu đề ngắn gọn <span class="text-danger">*</span></label>
+                            <input name="Title" class="form-control form-control-lg focus-teal bg-light border-0" value="@Model.Title" placeholder="VD: Nam sinh viên năm 2 tìm người ở ghép quận 10..." required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Mô tả chi tiết <span class="text-danger">*</span></label>
+                            <textarea name="Description" class="form-control focus-teal bg-light border-0" rows="6" placeholder="- Giới thiệu sơ về bạn (Tính cách, thói quen...)&#10;- Yêu cầu về phòng (Khu vực, giá tối đa...)&#10;- Yêu cầu về roommate (Sạch sẽ, không hút thuốc...)">@Model.Description</textarea>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-5">
+                            <a class="btn btn-light btn-lg flex-fill fw-bold rounded-pill text-muted" asp-controller="Room" asp-action="FindFeed">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-teal btn-lg flex-fill fw-bold rounded-pill shadow-sm">Đăng tìm bạn ngay</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Mô tả</label>
-        <textarea name="Description" class="form-control" rows="5">@Model.Description</textarea>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Đăng</button>
-    <a class="btn btn-outline-secondary ms-2" asp-controller="Room" asp-action="FindFeed">Quay lại</a>
-</form>
+</div>

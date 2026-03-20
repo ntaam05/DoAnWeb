@@ -3,36 +3,106 @@
     ViewData["Title"] = "Đăng phòng";
 }
 
-<h2 class="mb-3">Đăng Phòng (Người Cho Thuê)</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4 fw-bold text-teal"><i class="bi bi-house-add"></i> Đăng Phòng Cho Thuê</h2>
 
-<form asp-action="Create" method="post" enctype="multipart/form-data" class="w-75">
-    <div class="mb-3">
-        <label class="form-label">Tiêu đề</label>
-        <input asp-for="Title" class="form-control" required />
+            <form asp-action="Create" method="post" enctype="multipart/form-data" class="card shadow-sm border-0 rounded-4 p-4" id="createRoomForm">
+
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Thông tin cơ bản</h5>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Tiêu đề bài đăng <span class="text-danger">*</span></label>
+                    <input asp-for="Title" class="form-control focus-teal" placeholder="VD: Phòng trọ ban công thoáng mát..." required />
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Giá thuê (VNĐ/tháng) <span class="text-danger">*</span></label>
+                        <input asp-for="Price" type="number" class="form-control focus-teal" placeholder="VD: 3500000" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold"><i class="bi bi-geo-alt-fill text-danger"></i> Link Google Maps (Tùy chọn)</label>
+                        <input asp-for="MapLink" class="form-control focus-teal" placeholder="Dán link chia sẻ từ Google Maps vào đây..." />
+                        <small class="text-muted">Lấy từ nút "Chia sẻ" -> "Sao chép liên kết" trên Google Maps</small>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mt-4 mb-3 border-bottom pb-2">Đặc điểm & Tiện ích (Hashtags)</h5>
+                <div class="mb-4">
+                    <p class="text-muted small mb-2">Chọn các thẻ hashtag phù hợp để người thuê dễ dàng tìm thấy phòng của bạn:</p>
+
+                    <div class="mb-2">
+                        <strong class="d-block mb-1 text-teal small">Khu vực TP.HCM:</strong>
+                        <div class="d-flex flex-wrap gap-2" id="hashtag-area">
+                            @foreach (var tag in new[] { "Quận 1", "Quận 3", "Quận 10", "Quận 7", "Bình Thạnh", "Thủ Đức", "Gò Vấp", "Tân Bình", "Phú Nhuận" })
+                            {
+                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
+                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-2 mt-3">
+                        <strong class="d-block mb-1 text-teal small">Sức chứa & Đối tượng:</strong>
+                        <div class="d-flex flex-wrap gap-2" id="hashtag-people">
+                            @foreach (var tag in new[] { "1 Người", "2 Người", "3 Người", "Nam", "Nữ", "Sinh viên", "Người đi làm" })
+                            {
+                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
+                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-2 mt-3">
+                        <strong class="d-block mb-1 text-teal small">Tiện ích nội khu:</strong>
+                        <div class="d-flex flex-wrap gap-2" id="hashtag-amenities">
+                            @foreach (var tag in new[] { "Được nuôi Pet", "Có máy lạnh", "Giờ giấc tự do", "Có gác lửng", "WC riêng", "Có máy giặt", "Ban công", "Chỗ để xe" })
+                            {
+                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
+                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
+                            }
+                        </div>
+                    </div>
+
+                    <input type="hidden" asp-for="Hashtags" id="HashtagsInput" />
+                </div>
+
+                <h5 class="fw-bold mt-4 mb-3 border-bottom pb-2">Hình ảnh & Mô tả</h5>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Ảnh phòng <span class="text-danger">*</span></label>
+                    <input type="file" id="imageInput" name="images" multiple accept="image/*" class="form-control focus-teal" required />
+                    <div class="form-text text-info"><i class="bi bi-info-circle"></i> Có thể chọn nhiều ảnh cùng lúc. Ảnh đầu tiên sẽ làm ảnh bìa.</div>
+                </div>
+
+                <div id="preview" class="row mt-3 mb-3"></div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Mô tả chi tiết <span class="text-danger">*</span></label>
+                    <textarea asp-for="Description" class="form-control focus-teal" rows="5" placeholder="Điện nước tính sao, gần các trường ĐH nào, quy định ra sao..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-teal w-100 py-3 fw-bold fs-5 rounded-pill">ĐĂNG PHÒNG LÊN HỆ THỐNG</button>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label class="form-label">Giá (VNĐ)</label>
-        <input asp-for="Price" type="number" class="form-control" required />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Ảnh phòng</label>
-        <input type="file" id="imageInput" name="images" multiple accept="image/*" class="form-control" />
-        <div class="form-text">Có thể chọn nhiều ảnh cùng lúc.</div>
-    </div>
-
-    <div id="preview" class="row mt-3"></div>
-
-    <div class="mb-3">
-        <label class="form-label">Mô tả</label>
-        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Đăng</button>
-</form>
+<style>
+    .btn-teal { background-color: var(--primary-teal); color: white; border: none; }
+    .btn-teal:hover { background-color: var(--primary-teal-hover); color: white; }
+    .focus-teal:focus { border-color: var(--primary-teal); box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25); }
+    .text-teal { color: var(--primary-teal); }
+    /* Nút hashtag khi được chọn */
+    .btn-check:checked + .btn-outline-secondary {
+        background-color: var(--primary-teal);
+        color: white;
+        border-color: var(--primary-teal);
+    }
+</style>
 
 <script>
+    // Xử lý Preview ảnh
     const input = document.getElementById("imageInput");
     const preview = document.getElementById("preview");
 
@@ -46,19 +116,22 @@
             const reader = new FileReader();
             reader.onload = function (e) {
                 const col = document.createElement("div");
-                col.className = "col-md-3 mb-3";
-
+                col.className = "col-4 col-md-3 mb-3";
                 col.innerHTML = `
-                    <div class="border rounded p-2">
-                        <img src="${e.target.result}" class="img-fluid rounded" style="height:150px; width:100%; object-fit:cover;" alt="preview">
-                        <div class="small text-muted mt-2 text-truncate">${file.name}</div>
+                    <div class="border rounded p-1 position-relative shadow-sm">
+                        <img src="${e.target.result}" class="img-fluid rounded" style="height:100px; width:100%; object-fit:cover;" alt="preview">
                     </div>
                 `;
-
                 preview.appendChild(col);
             };
-
             reader.readAsDataURL(file);
         });
+    });
+
+    // Xử lý gom các Hashtag được chọn vào input ẩn trước khi Submit
+    document.getElementById('createRoomForm').addEventListener('submit', function() {
+        const checkedBoxes = document.querySelectorAll('.hashtag-check:checked');
+        const tags = Array.from(checkedBoxes).map(cb => cb.value);
+        document.getElementById('HashtagsInput').value = tags.join(','); // Ví dụ: "#Quan1,#CoMayLanh,#2Nguoi"
     });
 </script>

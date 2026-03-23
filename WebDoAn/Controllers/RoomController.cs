@@ -114,7 +114,9 @@ public class RoomController : Controller
         ViewBag.AvgRate = Math.Round(reviews.Average(x => (decimal?)x.Rating) ?? 0.0m, 1);
         ViewBag.RatingCount = reviews.Count;
         ViewBag.HasReviewed = !string.IsNullOrEmpty(email) && reviews.Any(x => x.UserEmail == email);
-
+        var owner = _context.UserAccounts.FirstOrDefault(u => u.Email == post.OwnerId);
+        ViewBag.OwnerName = owner != null && !string.IsNullOrWhiteSpace(owner.FullName) ? owner.FullName : post.OwnerId.Split('@')[0];
+        ViewBag.OwnerAvatar = owner != null && !string.IsNullOrWhiteSpace(owner.AvatarUrl) ? owner.AvatarUrl : "https://i.pravatar.cc/150?img=3";
         return View(post);
     }
 
@@ -144,7 +146,8 @@ public class RoomController : Controller
                 Nickname = string.IsNullOrEmpty(x.user.FullName) ? x.user.Email.Split('@')[0] : x.user.FullName,
                 Avatar = string.IsNullOrEmpty(x.user.AvatarUrl) ? "https://i.pravatar.cc/150?img=3" : x.user.AvatarUrl
             }).OrderBy(x => x.CreatedAt).ToList();
-
+        var owner = _context.UserAccounts.FirstOrDefault(u => u.Email == post.OwnerId);
+        ViewBag.OwnerName = owner != null && !string.IsNullOrWhiteSpace(owner.FullName) ? owner.FullName : post.OwnerId.Split('@')[0];
         var comments = rawComments.Select(x =>
         {
             var replied = x.ReplyToCommentId != null ? rawComments.FirstOrDefault(c => c.Id == x.ReplyToCommentId) : null;

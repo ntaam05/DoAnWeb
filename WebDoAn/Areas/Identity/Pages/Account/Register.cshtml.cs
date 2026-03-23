@@ -13,6 +13,7 @@ using System.Net;
 using System.Net.Mail;
 using WebDoAn.Data;
 using WebDoAn.Models;
+
 namespace WebDoAn.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -33,40 +34,12 @@ namespace WebDoAn.Areas.Identity.Pages.Account
 
         private static readonly string[] VietnamProvinces = new[]
         {
-            "An Giang",
-            "Bắc Ninh",
-            "Cà Mau",
-            "Cao Bằng",
-            "Cần Thơ",
-            "Đà Nẵng",
-            "Đắk Lắk",
-            "Điện Biên",
-            "Đồng Nai",
-            "Đồng Tháp",
-            "Gia Lai",
-            "Hà Nội",
-            "Hà Tĩnh",
-            "Hải Phòng",
-            "Hưng Yên",
-            "Huế",
-            "Khánh Hòa",
-            "Lai Châu",
-            "Lạng Sơn",
-            "Lâm Đồng",
-            "Lào Cai",
-            "Nghệ An",
-            "Ninh Bình",
-            "Phú Thọ",
-            "Quảng Ngãi",
-            "Quảng Ninh",
-            "Quảng Trị",
-            "Sơn La",
-            "Tây Ninh",
-            "Thái Nguyên",
-            "Thanh Hóa",
-            "Thành phố Hồ Chí Minh",
-            "Tuyên Quang",
-            "Vĩnh Long"
+            "An Giang", "Bắc Ninh", "Cà Mau", "Cao Bằng", "Cần Thơ", "Đà Nẵng", "Đắk Lắk",
+            "Điện Biên", "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng",
+            "Hưng Yên", "Huế", "Khánh Hòa", "Lai Châu", "Lạng Sơn", "Lâm Đồng", "Lào Cai",
+            "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị",
+            "Sơn La", "Tây Ninh", "Thái Nguyên", "Thanh Hóa", "Thành phố Hồ Chí Minh",
+            "Tuyên Quang", "Vĩnh Long"
         };
 
         public List<SelectListItem> ProvinceOptions { get; set; } = new();
@@ -118,9 +91,6 @@ namespace WebDoAn.Areas.Identity.Pages.Account
             [Display(Name = "Quê quán")]
             public string Hometown { get; set; }
 
-            [Display(Name = "Avatar (tuỳ chọn)")]
-            public IFormFile Avatar { get; set; }
-
             public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
             {
                 var currentYear = DateTime.Now.Year;
@@ -150,26 +120,6 @@ namespace WebDoAn.Areas.Identity.Pages.Account
                 if (!string.IsNullOrWhiteSpace(Gender) && !allowedGenders.Contains(Gender))
                 {
                     yield return new ValidationResult("Giới tính không hợp lệ.", new[] { nameof(Gender) });
-                }
-
-                if (Avatar != null)
-                {
-                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-                    var ext = Path.GetExtension(Avatar.FileName)?.ToLowerInvariant();
-
-                    if (!allowedExtensions.Contains(ext))
-                    {
-                        yield return new ValidationResult(
-                            "Avatar chỉ chấp nhận file .jpg, .jpeg, .png, .webp",
-                            new[] { nameof(Avatar) });
-                    }
-
-                    if (Avatar.Length > 2 * 1024 * 1024)
-                    {
-                        yield return new ValidationResult(
-                            "Avatar không được vượt quá 2MB.",
-                            new[] { nameof(Avatar) });
-                    }
                 }
             }
         }
@@ -246,7 +196,6 @@ namespace WebDoAn.Areas.Identity.Pages.Account
 
         public IActionResult OnPost(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
             LoadProvinceOptions();
 
             var email = (Input.Email ?? "").Trim().ToLowerInvariant();
@@ -269,6 +218,7 @@ namespace WebDoAn.Areas.Identity.Pages.Account
                 return Page();
             }
 
+            // CHỐT CHUẨN LOẠI TÀI KHOẢN
             var userType = (Input.UserType == "Landlord" || Input.UserType == "Tenant") ? Input.UserType : "Tenant";
 
             var exists = _context.UserAccounts.Any(x => x.Email == email);
@@ -287,29 +237,32 @@ namespace WebDoAn.Areas.Identity.Pages.Account
                 BirthYear = (Input.BirthYear ?? "").Trim(),
                 Gender = (Input.Gender ?? "").Trim(),
                 Hometown = (Input.Hometown ?? "").Trim(),
-                AvatarUrl = SaveUpload(Input.Avatar, "avatars") ?? ""
+                AvatarUrl = "" // Vì đã bỏ tính năng upload Avatar lúc đăng ký
             };
 
             _context.UserAccounts.Add(user);
             _context.SaveChanges();
 
+            // Xóa cache xác thực email
             HttpContext.Session.Remove(REGISTER_EMAIL_CODE);
             HttpContext.Session.Remove(REGISTER_EMAIL_CODE_EXPIRE);
             HttpContext.Session.Remove(REGISTER_EMAIL_VERIFIED);
             HttpContext.Session.Remove(REGISTER_PENDING_EMAIL);
 
+            // Tự động đăng nhập
             HttpContext.Session.SetString("CURRENT_USER_EMAIL", email);
             HttpContext.Session.SetString("CURRENT_USER_TYPE", userType);
 
-            // NẾU LÀ NGƯỜI THUÊ -> CHUYỂN SANG TRANG CHỌN TAG AI
-            if (Input.UserType == "Tenant")
+            // ==========================================
+            // FIX LỖI: KIỂM TRA CHUẨN XÁC LOẠI TÀI KHOẢN
+            // ==========================================
+            if (userType == "Tenant")
             {
-                return Redirect("/Profile/Onboarding");
+                return Redirect("/Profile/Onboarding"); // Trượt qua trang chọn thẻ AI
             }
-            // NẾU LÀ CHỦ TRỌ -> VỀ THẲNG TRANG CHỦ HOẶC QUẢN LÝ PHÒNG
             else
             {
-                return LocalRedirect(returnUrl ?? "~/");
+                return LocalRedirect("~/"); // Ép về trang chủ, bỏ qua mọi returnUrl đang bị kẹt
             }
         }
 
@@ -328,22 +281,6 @@ namespace WebDoAn.Areas.Identity.Pages.Account
             smtp.Credentials = new NetworkCredential(fromEmail, appPassword);
             smtp.EnableSsl = true;
             smtp.Send(message);
-        }
-
-        private string? SaveUpload(IFormFile? file, string folder)
-        {
-            if (file == null || file.Length == 0) return null;
-
-            var ext = Path.GetExtension(file.FileName);
-            var fileName = $"{Guid.NewGuid():N}{ext}";
-            var dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folder);
-            Directory.CreateDirectory(dir);
-
-            var path = Path.Combine(dir, fileName);
-            using var stream = System.IO.File.Create(path);
-            file.CopyTo(stream);
-
-            return $"/uploads/{folder}/{fileName}";
         }
     }
 }

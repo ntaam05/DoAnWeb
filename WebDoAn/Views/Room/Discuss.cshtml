@@ -28,6 +28,25 @@
         if (val == null) return null;
         return (val is DateTime dt) ? dt : (DateTime.TryParse(val.ToString(), out var result) ? result : null);
     }
+
+    // Hàm rút gọn tin nhắn reply
+    public string SafePreview(string text, int maxLen = 40)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        text = text.Replace("\r", " ").Replace("\n", " ").Trim();
+        return text.Length <= maxLen ? text : text.Substring(0, maxLen) + "...";
+    }
+
+    // Hàm tìm tin nhắn gốc để lấy nội dung reply nếu DB chưa lưu sẵn nội dung
+    public object FindMessageById(dynamic chatMessages, int? id)
+    {
+        if (chatMessages == null || id == null) return null;
+        foreach (var item in chatMessages)
+        {
+            if (GetPropInt(item, "Id") == id) return item;
+        }
+        return null;
+    }
 }
 
 <style>
@@ -54,7 +73,7 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
 
     .chat-footer-form {
@@ -82,18 +101,30 @@
         margin-bottom: 8px;
     }
 
+    .msg-group-other {
+        align-items: flex-end;
+    }
+
     .msg-group-me {
         margin-left: auto;
         flex-direction: column;
         align-items: flex-end;
     }
 
-    .msg-other-wrapper {
+    .msg-other-content {
         display: flex;
-        align-items: flex-end;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    /* FIX BUBBLE: Thêm min-width và margin-bottom để không bị che icon */
+    .nickname-chat {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #65676b;
+        margin-left: 5px;
+        margin-bottom: 2px;
+    }
+
     .bubble {
         padding: 10px 16px;
         border-radius: 18px;
@@ -101,8 +132,8 @@
         position: relative;
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         width: fit-content !important;
-        min-width: 65px !important; /* Đảm bảo đủ chỗ cho icon */
-        margin-bottom: 12px; /* Tạo khoảng trống cho badge trồi xuống */
+        min-width: 65px !important;
+        margin-bottom: 12px;
     }
 
     .bubble-other {
@@ -115,9 +146,25 @@
         background-color: var(--msg-teal);
         color: white;
         border-bottom-right-radius: 4px;
+        align-self: flex-end;
     }
 
-    /* REACTION BADGE: Nổi bật hơn, chống bị che */
+    /* HIỂN THỊ TIN NHẮN TRÍCH DẪN (REPLY) */
+    .reply-quote {
+        font-size: 0.8rem;
+        background: rgba(0,0,0,0.05);
+        padding: 6px 10px;
+        border-left: 3px solid var(--reply-border);
+        border-radius: 8px;
+        margin-bottom: 6px;
+        opacity: 0.85;
+    }
+
+    .bubble-me .reply-quote {
+        background: rgba(255,255,255,0.15);
+        color: #f0f0f0;
+    }
+
     .reaction-badge {
         position: absolute;
         bottom: -12px;
@@ -142,7 +189,6 @@
         left: 8px;
     }
 
-    /* REACTION BAR (THANH CHỌN EMOJI) */
     .reaction-bar {
         position: absolute;
         top: -42px;
@@ -158,6 +204,14 @@
 
     .msg-group:hover .reaction-bar {
         display: flex;
+    }
+
+    .msg-group-me .reaction-bar {
+        right: 0;
+    }
+
+    .msg-group-other .reaction-bar {
+        left: 0;
     }
 
     .reaction-item {
@@ -251,24 +305,42 @@
                             var email = GetPropString(msg, "UserEmail");
                             var nickname = GetPropString(msg, "Nickname");
                             var content = GetPropString(msg, "Content");
+                            var avatar = GetPropString(msg, "Avatar") ?? "https://i.pravatar.cc/150?img=3";
                             var time = GetPropDate(msg, "CreatedAt");
                             var msgId = GetPropInt(msg, "Id");
                             bool isMe = (email == currentUserEmail);
 
-                            <div class="msg-group @(isMe ? "msg-group-me" : "msg-group-other")" data-id="@msgId">
-                                <div class="msg-other-wrapper">
-                                    @if (!isMe)
+                            // LẤY DỮ LIỆU REPLY
+                            var replyId = GetPropInt(msg, "ReplyToCommentId");
+                            var replyToNickname = GetPropString(msg, "ReplyToNickname");
+                            var replyToContent = GetPropString(msg, "ReplyToContent");
+
+                            // Nếu DB chưa có trường Tên/Nội dung reply, tự động dò tìm trong danh sách
+                            if (replyId != null && string.IsNullOrWhiteSpace(replyToContent))
+                            {
+                                var repliedMsg = FindMessageById(chatMessages, replyId);
+                                if (repliedMsg != null)
+                                {
+                                    replyToNickname = GetPropString(repliedMsg, "Nickname");
+                                    if (string.IsNullOrWhiteSpace(replyToNickname))
                                     {
-                                        <img src="@GetPropString(msg, "Avatar")" class="avatar-chat-circle" onerror="this.src='https://i.pravatar.cc/150?img=3'" />
+                                        var rEmail = GetPropString(repliedMsg, "UserEmail");
+                                        replyToNickname = !string.IsNullOrEmpty(rEmail) ? rEmail.Split('@')[0] : "Ai đó";
                                     }
+                                    replyToContent = GetPropString(repliedMsg, "Content");
+                                }
+                            }
 
+                            // LẤY DỮ LIỆU REACTION ĐÃ LƯU TRONG DATABASE (Giả sử bạn đặt tên cột là Reaction)
+                            var savedReaction = GetPropString(msg, "Reaction");
+
+                            <div class="msg-group @(isMe ? "msg-group-me" : "msg-group-other")" data-id="@msgId">
+                                @if (!isMe)
+                                {
+                                    <img src="@avatar" class="avatar-chat-circle" onerror="this.src='https://i.pravatar.cc/150?img=3'" />
                                     <div class="msg-other-content">
-                                        @if (!isMe)
-                                        {
-                                            <div class="nickname-chat">@nickname</div>
-                                        }
-
-                                        <div class="bubble @(isMe ? "bubble-me" : "bubble-other")">
+                                        <div class="nickname-chat">@nickname</div>
+                                        <div class="bubble bubble-other">
                                             <div class="reaction-bar">
                                                 <span class="reaction-item" onclick="react('@msgId', '👍')">👍</span>
                                                 <span class="reaction-item" onclick="react('@msgId', '❤️')">❤️</span>
@@ -276,17 +348,59 @@
                                                 <span class="reaction-item" onclick="react('@msgId', '😮')">😮</span>
                                             </div>
 
+                                            @* BẢN FIX 1: HIỆN TIN NHẮN TRÍCH DẪN *@
+                                            @if (replyId != null && !string.IsNullOrWhiteSpace(replyToContent))
+                                            {
+                                                <div class="reply-quote">
+                                                    <strong>@(string.IsNullOrWhiteSpace(replyToNickname) ? "Người dùng" : replyToNickname)</strong>:
+                                                    <span>@SafePreview(replyToContent)</span>
+                                                </div>
+                                            }
+
                                             @content
 
-                                            <div class="reaction-badge" id="react-@msgId"></div>
+                                            @* BẢN FIX 2: LOAD ICON TỪ DATABASE (NẾU CÓ) *@
+                                            <div class="reaction-badge @(!string.IsNullOrEmpty(savedReaction) ? "active" : "")" id="react-@msgId">
+                                                @savedReaction
+                                            </div>
                                         </div>
-
                                         <div class="msg-tools">
                                             <span>@(time?.ToString("HH:mm"))</span>
                                             <span class="btn-reply-action" onclick="setReply('@msgId', '@nickname', '@content')">Trả lời</span>
                                         </div>
                                     </div>
-                                </div>
+                                }
+                                else
+                                {
+                                    <div class="bubble bubble-me">
+                                        <div class="reaction-bar">
+                                            <span class="reaction-item" onclick="react('@msgId', '👍')">👍</span>
+                                            <span class="reaction-item" onclick="react('@msgId', '❤️')">❤️</span>
+                                            <span class="reaction-item" onclick="react('@msgId', '😂')">😂</span>
+                                            <span class="reaction-item" onclick="react('@msgId', '😮')">😮</span>
+                                        </div>
+
+                                        @* BẢN FIX 1: HIỆN TIN NHẮN TRÍCH DẪN *@
+                                        @if (replyId != null && !string.IsNullOrWhiteSpace(replyToContent))
+                                        {
+                                            <div class="reply-quote">
+                                                <strong>@(string.IsNullOrWhiteSpace(replyToNickname) ? "Người dùng" : replyToNickname)</strong>:
+                                                <span>@SafePreview(replyToContent)</span>
+                                            </div>
+                                        }
+
+                                        @content
+
+                                        @* BẢN FIX 2: LOAD ICON TỪ DATABASE *@
+                                        <div class="reaction-badge @(!string.IsNullOrEmpty(savedReaction) ? "active" : "")" id="react-@msgId">
+                                            @savedReaction
+                                        </div>
+                                    </div>
+                                    <div class="msg-tools">
+                                        <span>@(time?.ToString("HH:mm"))</span>
+                                        <span class="btn-reply-action" onclick="setReply('@msgId', 'Bạn', '@content')">Trả lời</span>
+                                    </div>
+                                }
                             </div>
                         }
                     }
@@ -295,7 +409,7 @@
                 <div class="chat-footer-form">
                     <div id="replyBox" class="reply-preview-box">
                         <div class="d-flex justify-content-between align-items-center small">
-                            <div class="text-truncate">Đang trả lời <strong>@Html.Raw("<span id='replyName'></span>")</strong>: <span id="replyText"></span></div>
+                            <div class="text-truncate">Đang trả lời <strong id="replyName"></strong>: <span id="replyText"></span></div>
                             <button class="btn-close" style="font-size: 0.6rem;" onclick="cancelReply()"></button>
                         </div>
                     </div>
@@ -312,6 +426,12 @@
                             </div>
                         </form>
                     }
+                    else
+                    {
+                        <div class="text-center text-muted small">
+                            Vui lòng <a href="/Identity/Account/Login" class="text-teal fw-bold">Đăng nhập</a> để tham gia.
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -324,9 +444,8 @@
     const replyBox = document.getElementById("replyBox");
     const msgInput = document.getElementById("msgInput");
 
-    if (chatWindow) {
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
+    // Cuộn xuống cuối
+    if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
 
     function setReply(id, name, content) {
         replyInput.value = id;
@@ -341,12 +460,28 @@
         replyBox.classList.remove("show");
     }
 
+    // BẢN FIX 2: HÀM REACT CÓ GỌI FETCH API ĐỂ LƯU VÀO DB
     function react(msgId, icon) {
+        // 1. Cập nhật giao diện mượt mà ngay lập tức
         const badge = document.getElementById("react-" + msgId);
         if (badge) {
             badge.innerText = icon;
             badge.classList.add("active");
-            console.log("Reaction " + icon + " cho msg " + msgId);
         }
+
+        // 2. Gửi ngầm (AJAX) lên Controller để lưu vào SQL
+        // Lưu ý: Đường dẫn /Room/ReactComment này phải khớp với Action trong Controller của bạn
+        fetch(`/Room/ReactComment?commentId=${msgId}&icon=${encodeURIComponent(icon)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error("Lỗi: Không thể lưu tương tác vào cơ sở dữ liệu.");
+            }
+        })
+        .catch(error => console.error("Lỗi mạng:", error));
     }
 </script>

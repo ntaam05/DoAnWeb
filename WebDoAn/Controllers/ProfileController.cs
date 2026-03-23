@@ -195,4 +195,44 @@ public class ProfileController : Controller
 
         return RedirectToAction("RecommendedRooms", "Room");
     }
+    [HttpPost]
+    public IActionResult ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+    {
+        var email = HttpContext.Session.GetString(CURRENT_EMAIL);
+        if (string.IsNullOrEmpty(email)) return RedirectToAction("Login", "Account");
+
+        var user = _context.UserAccounts.FirstOrDefault(x => x.Email == email);
+        if (user == null) return RedirectToAction("Login", "Account");
+
+        if (string.IsNullOrEmpty(currentPassword) || string.IsNullOrEmpty(newPassword) || string.IsNullOrEmpty(confirmPassword))
+        {
+            TempData["AuthError"] = "Vui lòng nhập đầy đủ thông tin mật khẩu.";
+            return RedirectToAction("Edit");
+        }
+
+        if (user.Password != currentPassword)
+        {
+            TempData["AuthError"] = "Mật khẩu hiện tại không chính xác.";
+            return RedirectToAction("Edit");
+        }
+
+        if (newPassword != confirmPassword)
+        {
+            TempData["AuthError"] = "Mật khẩu xác nhận không khớp.";
+            return RedirectToAction("Edit");
+        }
+
+        if (newPassword.Length < 8)
+        {
+            TempData["AuthError"] = "Mật khẩu mới phải có ít nhất 8 ký tự.";
+            return RedirectToAction("Edit");
+        }
+
+        // Cập nhật mật khẩu mới vào Database
+        user.Password = newPassword;
+        _context.SaveChanges();
+
+        TempData["Message"] = "Đổi mật khẩu thành công!";
+        return RedirectToAction("Edit");
+    }
 }

@@ -120,12 +120,6 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Input.Avatar" class="form-label text-muted">Avatar (tuỳ chọn)</label>
-                            <input asp-for="Input.Avatar" type="file" class="form-control" accept="image/*" />
-                            <span asp-validation-for="Input.Avatar" class="text-danger small"></span>
-                        </div>
-
                         <button id="registerSubmit" type="submit" class="btn text-white w-100 py-3 fw-bold rounded-pill shadow-sm hover-teal-dark mt-2" style="background-color: var(--primary-teal);">
                             ĐĂNG KÝ NGAY
                         </button>
@@ -375,5 +369,4 @@
             initUserTypeSelection();
         })();
     </script>
-}
 }

@@ -4,39 +4,26 @@
 }
 
 <style>
-    .img-container {
-        max-height: 450px;
-        width: 100%;
-    }
-
-    #imageToCrop {
-        display: block;
-        max-width: 100%;
-    }
-
-    .btn-teal {
-        background-color: var(--primary-teal);
-        color: white;
-        border: none;
-    }
+    .img-container { max-height: 450px; width: 100%; }
+    #imageToCrop { display: block; max-width: 100%; }
     
-    .focus-teal:focus {
-        border-color: var(--primary-teal);
-        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
-    }
+    .btn-teal { background-color: var(--primary-teal); color: white; border: none; }
+    .btn-teal:hover { background-color: #0d8a7d; color: white; }
+
+    .btn-outline-teal { color: var(--primary-teal); border-color: var(--primary-teal); }
+    .btn-outline-teal:hover { background-color: var(--primary-teal); color: white; }
     
-    .text-teal {
-        color: var(--primary-teal);
-    }
+    .focus-teal:focus { border-color: var(--primary-teal); box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25); }
+    .text-teal { color: var(--primary-teal); }
 </style>
 
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-7">
             <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
-                <h2 class="fw-bold text-teal mb-4"><i class="bi bi-pencil-square"></i> Cập nhật thông tin</h2>
-
-                <form method="post" id="profileForm">
+                
+                <h3 class="fw-bold text-teal mb-4"><i class="bi bi-pencil-square"></i> Cập nhật thông tin</h3>
+                <form method="post" id="profileForm" asp-action="Edit">
                     <div class="text-center mb-4">
                         <div class="position-relative d-inline-block">
                             <img id="avatarPreview" src="@(Model.AvatarUrl ?? "https://i.pravatar.cc/150?img=3")"
@@ -79,6 +66,40 @@
                     </button>
                 </form>
 
+                <hr class="my-5 opacity-25" />
+
+                <h4 class="fw-bold text-teal mb-4"><i class="bi bi-shield-lock"></i> Đổi mật khẩu</h4>
+                <form method="post" asp-action="ChangePassword">
+                    <div class="mb-3 position-relative form-floating">
+                        <input type="password" name="currentPassword" id="currentPassword" class="form-control focus-teal" placeholder="Mật khẩu hiện tại" required />
+                        <label class="text-muted">Mật khẩu hiện tại</label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary position-absolute toggle-password" data-target="currentPassword" style="top:12px; right:10px; z-index:10;">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6 position-relative form-floating">
+                            <input type="password" name="newPassword" id="newPassword" class="form-control focus-teal" placeholder="Mật khẩu mới" required minlength="8" />
+                            <label class="text-muted">Mật khẩu mới</label>
+                            <button type="button" class="btn btn-sm btn-outline-secondary position-absolute toggle-password" data-target="newPassword" style="top:12px; right:10px; z-index:10;">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-6 position-relative form-floating">
+                            <input type="password" name="confirmPassword" id="confirmPassword" class="form-control focus-teal" placeholder="Xác nhận mật khẩu" required minlength="8" />
+                            <label class="text-muted">Xác nhận mật khẩu</label>
+                            <button type="button" class="btn btn-sm btn-outline-secondary position-absolute toggle-password" data-target="confirmPassword" style="top:12px; right:10px; z-index:10;">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-teal w-100 py-3 fw-bold rounded-pill shadow-sm">
+                        CẬP NHẬT MẬT KHẨU
+                    </button>
+                </form>
+
                 <div class="mt-5 p-4 bg-light rounded-4 text-center border shadow-sm">
                     <h5 class="fw-bold text-teal mb-2"><i class="bi bi-tags"></i> Quản lý Sở thích & Yêu cầu</h5>
                     <p class="text-muted small">Bạn muốn đổi gu tìm phòng? Hãy cập nhật lại các thẻ thói quen để thuật toán AI gợi ý phòng chính xác hơn nhé.</p>
@@ -92,12 +113,12 @@
     </div>
 </div>
 
-<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
+<div class="modal fade" id="cropperModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cropperModalLabel">Cắt ảnh đại diện</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Cắt ảnh đại diện</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
                 <div class="img-container">
@@ -114,6 +135,25 @@
 
 @section Scripts {
     <script>
+        // Tính năng tắt mở con mắt hiển thị mật khẩu
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                }
+            });
+        });
+
+        // Tính năng Cắt Ảnh (Cropper)
         let cropper;
         const avatarInput = document.getElementById('avatarInput');
         const imageToCrop = document.getElementById('imageToCrop');
@@ -149,21 +189,14 @@
         });
 
         document.getElementById('cropperModal').addEventListener('hidden.bs.modal', function () {
-            if(cropper) {
-                cropper.destroy();
-            }
+            if(cropper) cropper.destroy();
         });
 
         document.getElementById('cropButton').onclick = function() {
-            const canvas = cropper.getCroppedCanvas({
-                width: 400,
-                height: 400,
-            });
-
+            const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
             const base64Image = canvas.toDataURL('image/jpeg');
             document.getElementById('avatarPreview').src = base64Image;
             document.getElementById('croppedAvatarData').value = base64Image;
-
             cropperModal.hide();
         };
     </script>

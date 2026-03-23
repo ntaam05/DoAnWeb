@@ -1,9 +1,10 @@
 ﻿@model List<WebDoAn.Models.RoomPost>
+@using Microsoft.AspNetCore.Http
 @{
     ViewData["Title"] = "Trang chủ";
 }
 
-@* HÀM TÍNH THỜI GIAN THỰC (Vừa xong, 1 phút trước,...) *@
+@* HÀM TÍNH THỜI GIAN THỰC *@
 @functions {
 #nullable disable
     public string GetRelativeTime(DateTime time)
@@ -17,7 +18,6 @@
         return $"{(int)(ts.TotalDays / 365)} năm trước";
     }
 #nullable restore
-
 }
 
 <style>
@@ -73,33 +73,29 @@
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         scroll-behavior: smooth;
-        -ms-overflow-style: none; /* Ẩn thanh cuộn trên IE/Edge */
-        scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
         gap: 1.5rem;
         padding: 10px 5px;
     }
 
         .room-slider::-webkit-scrollbar {
-            display: none; /* Ẩn thanh cuộn trên Chrome/Safari */
+            display: none;
         }
 
     .room-slide {
-        flex: 0 0 calc(33.333% - 1rem); /* Hiện 3 thẻ trên PC */
+        flex: 0 0 calc(33.333% - 1rem);
         scroll-snap-align: start;
     }
-
     @@media (max-width: 991px) {
         .room-slide {
             flex: 0 0 calc(50% - 0.75rem);
         }
-        /* Hiện 2 thẻ trên Tablet */
     }
-
     @@media (max-width: 767px) {
         .room-slide {
             flex: 0 0 100%;
         }
-        /* Hiện 1 thẻ trên Mobile */
     }
 
     .slider-btn {
@@ -134,9 +130,7 @@
         right: -15px;
     }
 
-    /* ==================================================== */
-    /* CSS CHO HIỆU ỨNG WELCOME KHI LOGIN (GIỮ NGUYÊN BẢN CŨ CỦA BẠN VÀ THÊM VÀO DƯỚI) */
-    /* ==================================================== */
+    /* HIỆU ỨNG WELCOME */
     .welcome-overlay {
         position: fixed;
         top: 0;
@@ -164,7 +158,6 @@
         animation: textPop 1.3s ease-in-out forwards;
         filter: drop-shadow(0px 4px 15px rgba(240, 66, 255, 0.3));
     }
-
     @@keyframes fadeOverlay {
         0% {
             opacity: 0;
@@ -183,7 +176,6 @@
             visibility: hidden;
         }
     }
-
     @@keyframes textPop {
         0% {
             transform: scale(0.8);
@@ -220,7 +212,6 @@
     <div class="welcome-overlay" id="welcomeScreen">
         <div class="welcome-text">Welcome, @TempData["LoginWelcome"]</div>
     </div>
-
     <script>
         setTimeout(function() {
             var el = document.getElementById('welcomeScreen');
@@ -240,23 +231,45 @@
     <div class="search-box">
         <form action="/Room/Search" method="get" class="row g-3 align-items-end">
             <div class="col-md-3">
-                <label class="form-label text-muted small fw-bold"><i class="bi bi-tags text-teal"></i> Nhu cầu / Khu vực</label>
+                <label class="form-label text-muted small fw-bold"><i class="bi bi-tags text-teal"></i> Nhu cầu / Tiêu chí</label>
                 <div class="dropdown">
                     <button class="form-select border-0 border-bottom rounded-0 shadow-none focus-teal text-start bg-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                         <span><i class="bi bi-list-check me-2"></i> Chọn Hashtag...</span>
                     </button>
-                    <div class="dropdown-menu w-100 p-3 shadow border-0" style="max-height: 300px; overflow-y: auto;">
-                        <h6 class="dropdown-header text-teal fw-bold px-0"><i class="bi bi-geo-alt"></i> Khu vực</h6>
-                        @foreach (var tag in new[] { "Quận 1", "Quận 3", "Quận 7", "Quận 10", "Bình Thạnh", "Thủ Đức", "Gò Vấp", "Tân Bình" })
+                    <div class="dropdown-menu w-100 p-3 shadow border-0" style="max-height: 400px; overflow-y: auto;">
+
+                        <h6 class="dropdown-header text-teal fw-bold px-0"><i class="bi bi-geo-alt"></i> Khu vực TP.HCM</h6>
+                        @foreach (var tag in new[] { "Quận 1", "Quận 3", "Quận 10", "Quận 7", "Bình Thạnh", "Thủ Đức", "Gò Vấp", "Tân Bình", "Phú Nhuận" })
                         {
                             <div class="form-check mb-2">
                                 <input class="form-check-input focus-teal cursor-pointer" type="checkbox" name="hashtags" value="#@tag.Replace(" ", "")" id="search_@tag.Replace(" ", "")">
                                 <label class="form-check-label cursor-pointer" for="search_@tag.Replace(" ", "")">#@tag</label>
                             </div>
                         }
+
                         <hr class="dropdown-divider my-3">
-                        <h6 class="dropdown-header text-teal fw-bold px-0"><i class="bi bi-star"></i> Tiện ích & Đối tượng</h6>
-                        @foreach (var tag in new[] { "Được nuôi Pet", "Có máy lạnh", "Giờ giấc tự do", "WC riêng", "1 Người", "2 Người", "Nữ" })
+                        <h6 class="dropdown-header text-teal fw-bold px-0"><i class="bi bi-people"></i> Sức chứa & Đối tượng</h6>
+                        @foreach (var tag in new[] { "1 Người", "2 Người", "3 Người", "Nam", "Nữ", "Sinh viên", "Người đi làm" })
+                        {
+                            <div class="form-check mb-2">
+                                <input class="form-check-input focus-teal cursor-pointer" type="checkbox" name="hashtags" value="#@tag.Replace(" ", "")" id="search_@tag.Replace(" ", "")">
+                                <label class="form-check-label cursor-pointer" for="search_@tag.Replace(" ", "")">#@tag</label>
+                            </div>
+                        }
+
+                        <hr class="dropdown-divider my-3">
+                        <h6 class="dropdown-header text-teal fw-bold px-0"><i class="bi bi-house-check"></i> Tiện ích nội khu</h6>
+                        @foreach (var tag in new[] { "Được nuôi Pet", "Có máy lạnh", "Giờ giấc tự do", "Có gác lửng", "WC riêng", "Có máy giặt", "Ban công", "Chỗ để xe" })
+                        {
+                            <div class="form-check mb-2">
+                                <input class="form-check-input focus-teal cursor-pointer" type="checkbox" name="hashtags" value="#@tag.Replace(" ", "")" id="search_@tag.Replace(" ", "")">
+                                <label class="form-check-label cursor-pointer" for="search_@tag.Replace(" ", "")">#@tag</label>
+                            </div>
+                        }
+
+                        <hr class="dropdown-divider my-3">
+                        <h6 class="dropdown-header text-teal fw-bold px-0"><i class="bi bi-stars"></i> Môi trường & Lối sống</h6>
+                        @foreach (var tag in new[] { "Sạch sẽ", "Ngủ sớm", "Cú đêm", "Không hút thuốc", "Ít nấu ăn", "Hay nấu ăn", "Yêu động vật", "Hướng nội", "Hướng ngoại", "Hay đi chơi", "Thích yên tĩnh", "Thích thể thao", "Thường xuyên vắng nhà", "Không chung chủ", "An ninh tốt", "Gần siêu thị", "Có cửa sổ" })
                         {
                             <div class="form-check mb-2">
                                 <input class="form-check-input focus-teal cursor-pointer" type="checkbox" name="hashtags" value="#@tag.Replace(" ", "")" id="search_@tag.Replace(" ", "")">
@@ -269,12 +282,43 @@
 
             <div class="col-md-3">
                 <label class="form-label text-muted small fw-bold"><i class="bi bi-cash text-teal"></i> Mức giá</label>
-                <select class="form-select border-0 border-bottom rounded-0 shadow-none focus-teal" name="priceRange">
-                    <option value="" selected>Tất cả mức giá</option>
-                    <option value="0-2000000">Dưới 2 triệu</option>
-                    <option value="2000000-4000000">2 - 4 triệu</option>
-                    <option value="4000000-999999999">Trên 4 triệu</option>
-                </select>
+                <div class="dropdown">
+                    <button class="form-select border-0 border-bottom rounded-0 shadow-none focus-teal text-start bg-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        <span id="selectedPriceText" class="text-truncate">Tất cả mức giá</span>
+                    </button>
+
+                    <div class="dropdown-menu w-100 p-3 shadow border-0" style="min-width: 260px;">
+                        <h6 class="dropdown-header text-teal fw-bold px-0">Chọn mốc sẵn</h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input price-preset cursor-pointer" type="radio" name="pricePreset" value="" id="price_all" checked>
+                            <label class="form-check-label cursor-pointer" for="price_all">Tất cả mức giá</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input price-preset cursor-pointer" type="radio" name="pricePreset" value="0-2000000" id="price_under2">
+                            <label class="form-check-label cursor-pointer" for="price_under2">Dưới 2 triệu</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input price-preset cursor-pointer" type="radio" name="pricePreset" value="2000000-4000000" id="price_2to4">
+                            <label class="form-check-label cursor-pointer" for="price_2to4">2 - 4 triệu</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input price-preset cursor-pointer" type="radio" name="pricePreset" value="4000000-999999999" id="price_above4">
+                            <label class="form-check-label cursor-pointer" for="price_above4">Trên 4 triệu</label>
+                        </div>
+
+                        <hr class="dropdown-divider my-3">
+                        <h6 class="dropdown-header text-teal fw-bold px-0">Hoặc tự nhập ngân sách (VNĐ)</h6>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <input type="number" id="customMinPrice" class="form-control form-control-sm focus-teal" placeholder="Từ..." min="0">
+                            <span class="text-muted">-</span>
+                            <input type="number" id="customMaxPrice" class="form-control form-control-sm focus-teal" placeholder="Đến..." min="0">
+                        </div>
+                        <button type="button" id="applyCustomPrice" class="btn btn-sm text-white w-100 rounded-pill fw-bold" style="background-color: var(--primary-teal);">
+                            <i class="bi bi-check2-circle"></i> Áp dụng giá này
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="priceRange" id="hiddenPriceRange" value="" />
             </div>
 
             <div class="col-md-4">
@@ -383,22 +427,69 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script>
-        // Xử lý nút bấm thanh trượt phòng
+        // XỬ LÝ THANH TRƯỢT PHÒNG
         const roomSlider = document.getElementById('roomSlider');
         const btnPrev = document.getElementById('slidePrev');
         const btnNext = document.getElementById('slideNext');
 
         if (roomSlider && btnPrev && btnNext) {
-            // Khi bấm Next, trượt qua độ dài bằng chiều rộng của 1 khung chứa
-            btnNext.addEventListener('click', () => {
-                roomSlider.scrollBy({ left: roomSlider.offsetWidth, behavior: 'smooth' });
-            });
+            btnNext.addEventListener('click', () => { roomSlider.scrollBy({ left: roomSlider.offsetWidth, behavior: 'smooth' }); });
+            btnPrev.addEventListener('click', () => { roomSlider.scrollBy({ left: -roomSlider.offsetWidth, behavior: 'smooth' }); });
+        }
 
-            // Khi bấm Prev, trượt ngược lại
-            btnPrev.addEventListener('click', () => {
-                roomSlider.scrollBy({ left: -roomSlider.offsetWidth, behavior: 'smooth' });
+        // =========================================================
+        // XỬ LÝ LỌC GIÁ THÔNG MINH (CHUYỂN TỪ UI XUỐNG DỮ LIỆU BACKEND)
+        // =========================================================
+        const hiddenPrice = document.getElementById('hiddenPriceRange');
+        const priceText = document.getElementById('selectedPriceText');
+        const pricePresets = document.querySelectorAll('input[name="pricePreset"]');
+        const btnApplyCustom = document.getElementById('applyCustomPrice');
+
+        // 1. Khi chọn mốc giá có sẵn
+        pricePresets.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                // Cập nhật input ẩn để gửi đi
+                hiddenPrice.value = e.target.value;
+                // Cập nhật chữ hiển thị
+                priceText.innerText = e.target.nextElementSibling.innerText;
+                // Xóa rỗng ô tự nhập
+                document.getElementById('customMinPrice').value = '';
+                document.getElementById('customMaxPrice').value = '';
+            });
+        });
+
+        // 2. Khi bấm nút "Áp dụng giá tự nhập"
+        if(btnApplyCustom) {
+            btnApplyCustom.addEventListener('click', () => {
+                const minVal = document.getElementById('customMinPrice').value;
+                const maxVal = document.getElementById('customMaxPrice').value;
+
+                let min = minVal ? parseInt(minVal) : 0;
+                let max = maxVal ? parseInt(maxVal) : 999999999;
+
+                // Nếu người dùng có nhập ít nhất 1 số
+                if (minVal || maxVal) {
+                    if(min > max) { // Tự động đảo ngược nếu nhập sai thứ tự
+                        let temp = min; min = max; max = temp;
+                    }
+
+                    // Format thành chuỗi "min-max" (giống y hệt value của mốc có sẵn)
+                    hiddenPrice.value = `${min}-${max}`;
+
+                    // Format lại số tiền để hiển thị (thêm dấu chấm)
+                    const formatVND = (num) => (num === 999999999) ? "Max" : num.toLocaleString('vi-VN') + "đ";
+                    priceText.innerText = `${formatVND(min)} - ${formatVND(max)}`;
+                    priceText.classList.add('fw-bold');
+
+                    // Bỏ check tất cả các nút radio có sẵn
+                    pricePresets.forEach(r => r.checked = false);
+
+                    // Tự động đóng dropdown
+                    document.body.click();
+                }
             });
         }
     </script>

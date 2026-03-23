@@ -137,6 +137,10 @@ public class RoomController : Controller
                 x.comment.CreatedAt,
                 x.comment.UserEmail,
                 x.comment.ReplyToCommentId,
+
+                // >>> PHẢI THÊM DÒNG NÀY ĐỂ KÉO ICON TỪ DB LÊN <<<
+                x.comment.Reaction,
+
                 Nickname = string.IsNullOrEmpty(x.user.FullName) ? x.user.Email.Split('@')[0] : x.user.FullName,
                 Avatar = string.IsNullOrEmpty(x.user.AvatarUrl) ? "https://i.pravatar.cc/150?img=3" : x.user.AvatarUrl
             }).OrderBy(x => x.CreatedAt).ToList();
@@ -153,6 +157,10 @@ public class RoomController : Controller
                 x.Nickname,
                 x.Avatar,
                 x.ReplyToCommentId,
+
+                // >>> VÀ TRUYỀN NÓ VÀO BIẾN CUỐI CÙNG <<<
+                x.Reaction,
+
                 ReplyToNickname = replied != null ? replied.Nickname : null,
                 ReplyToContent = replied != null ? replied.Content : null
             };
@@ -504,5 +512,39 @@ public class RoomController : Controller
         ViewBag.IsAIRecommendation = true;
         ViewBag.Keyword = "";
         return View("Search", finalResult);
+    }
+    [HttpPost]
+    public async Task<IActionResult> ReactComment(int commentId, string icon)
+    {
+        // 1. Kiểm tra xem người dùng đã đăng nhập chưa
+        var email = HttpContext.Session.GetString(CURRENT_EMAIL);
+        if (string.IsNullOrEmpty(email))
+        {
+            return Unauthorized(new { message = "Vui lòng đăng nhập" });
+        }
+
+        // 2. Tìm tin nhắn cần thả tương tác trong Database
+        var comment = await _context.RoomComments.FindAsync(commentId);
+        if (comment == null)
+        {
+            return NotFound(new { message = "Không tìm thấy tin nhắn" });
+        }
+
+        // 3. Nếu người dùng bấm lại icon cũ (hủy tương tác)
+        if (comment.Reaction == icon)
+        {
+            comment.Reaction = null;
+        }
+        else
+        {
+            // 4. Lưu icon mới vào Database
+            comment.Reaction = icon;
+        }
+
+        // 5. Cập nhật Database
+        _context.Update(comment);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { success = true, reaction = comment.Reaction });
     }
 }

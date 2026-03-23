@@ -2,13 +2,23 @@
 @{
     ViewData["Title"] = "Tìm kiếm phòng trọ";
 
-    // Lấy lại trạng thái tìm kiếm từ Controller
+    // =========================================
+    // CODE CŨ GIỮ NGUYÊN: Lấy lại trạng thái tìm kiếm từ Controller
+    // =========================================
     var keyword = ViewBag.Keyword as string;
     var priceRange = ViewBag.PriceRange as string;
     var selectedHashtags = ViewBag.SelectedHashtags as List<string> ?? new List<string>();
+
+    // =========================================
+    // CODE MỚI THÊM: Bắt cờ xem đây có phải là kết quả AI Gợi ý không
+    // =========================================
+    bool isAIRecommendation = ViewBag.IsAIRecommendation != null && (bool)ViewBag.IsAIRecommendation;
 }
 
 <style>
+    /* ========================================= */
+    /* CODE CSS CŨ GIỮ NGUYÊN */
+    /* ========================================= */
     .room-card {
         transition: all 0.3s ease;
         border-radius: 12px;
@@ -29,77 +39,83 @@
     .cursor-pointer {
         cursor: pointer;
     }
+
+    /* ========================================= */
+    /* CODE CSS MỚI: HIỆU ỨNG TOAST TỰ ĐỘNG TẮT (KHÔNG DÙNG JS) */
+    /* ========================================= */
+    @@keyframes slideInOut {
+        0% {
+            top: -100px;
+            opacity: 0;
+        }
+        15% {
+            top: 30px;
+            opacity: 1;
+        }
+        85% {
+            top: 30px;
+            opacity: 1;
+        }
+        100% {
+            top: -100px;
+            opacity: 0;
+            display: none;
+        }
+    }
+
+    .ai-toast-custom {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 99999;
+        background: linear-gradient(135deg, #009688, #00796b);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(0, 150, 136, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        animation: slideInOut 4.5s ease-in-out forwards; /* Tự động chạy 4.5s rồi biến mất */
+        pointer-events: none;
+    }
 </style>
+
+@if (isAIRecommendation && Model != null && Model.Count > 0)
+{
+    <div class="ai-toast-custom">
+        <i class="bi bi-stars text-warning fs-4"></i>
+        <span>(Theo sở thích bạn đây là những phòng thích hợp)</span>
+    </div>
+}
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-teal m-0"><i class="bi bi-search"></i> Danh Sách Phòng Trọ</h2>
-        <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill"><i class="bi bi-house"></i> Về trang chủ</a>
+        <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill fw-bold px-3">
+            <i class="bi bi-house"></i> Về trang chủ
+        </a>
     </div>
 
-    <div class="card shadow-sm border-0 mb-5 rounded-4 p-4 bg-light">
-        <form action="/Room/Search" method="get" class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label text-muted small fw-bold"><i class="bi bi-tags text-teal"></i> Nhu cầu / Khu vực</label>
-                <div class="dropdown">
-                    <button class="form-select border-0 border-bottom rounded-0 shadow-none focus-teal text-start bg-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        <span><i class="bi bi-list-check me-2"></i> Chọn Hashtag...</span>
-                    </button>
-                    <div class="dropdown-menu w-100 p-3 shadow border-0" style="max-height: 300px; overflow-y: auto;">
-                        <h6 class="dropdown-header text-teal fw-bold px-0">Khu vực</h6>
-                        @foreach (var tag in new[] { "Quận 1", "Quận 3", "Quận 7", "Quận 10", "Bình Thạnh", "Thủ Đức", "Gò Vấp", "Tân Bình" })
-                        {
-                            var val = "#" + tag.Replace(" ", "");
-                            <div class="form-check mb-2">
-                                <input class="form-check-input focus-teal cursor-pointer" type="checkbox" name="hashtags" value="@val" id="s_@val" @(selectedHashtags.Contains(val) ? "checked" : "")>
-                                <label class="form-check-label cursor-pointer" for="s_@val">#@tag</label>
-                            </div>
-                        }
-                        <hr class="dropdown-divider my-3">
-                        <h6 class="dropdown-header text-teal fw-bold px-0">Tiện ích</h6>
-                        @foreach (var tag in new[] { "Được nuôi Pet", "Có máy lạnh", "Giờ giấc tự do", "WC riêng", "1 Người", "2 Người", "Nữ" })
-                        {
-                            var val = "#" + tag.Replace(" ", "");
-                            <div class="form-check mb-2">
-                                <input class="form-check-input focus-teal cursor-pointer" type="checkbox" name="hashtags" value="@val" id="s_@val" @(selectedHashtags.Contains(val) ? "checked" : "")>
-                                <label class="form-check-label cursor-pointer" for="s_@val">#@tag</label>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label text-muted small fw-bold"><i class="bi bi-cash text-teal"></i> Mức giá</label>
-                <select class="form-select border-0 border-bottom rounded-0 shadow-none focus-teal" name="priceRange">
-                    <option value="" selected="@(string.IsNullOrEmpty(priceRange) ? "selected" : null)">Tất cả mức giá</option>
-                    <option value="0-2000000" selected="@(priceRange == "0-2000000" ? "selected" : null)">Dưới 2 triệu</option>
-                    <option value="2000000-4000000" selected="@(priceRange == "2000000-4000000" ? "selected" : null)">2 - 4 triệu</option>
-                    <option value="4000000-999999999" selected="@(priceRange == "4000000-999999999" ? "selected" : null)">Trên 4 triệu</option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label text-muted small fw-bold"><i class="bi bi-search text-teal"></i> Từ khóa</label>
-                <input type="text" class="form-control border-0 border-bottom rounded-0 shadow-none focus-teal" placeholder="Nhập tên đường..." name="keyword" value="@keyword">
-            </div>
-
-            <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn text-white py-2 fw-bold w-100" style="background-color: var(--primary-teal);">Lọc</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="mb-3 text-muted">
-        Tìm thấy <strong>@Model.Count</strong> kết quả phù hợp.
-    </div>
-
-    @if (Model.Count == 0)
+    @if (Model == null || Model.Count == 0)
     {
-        <div class="alert alert-warning text-center py-5 rounded-4 border-0 shadow-sm">
-            <i class="bi bi-search fs-1 d-block mb-3 text-muted"></i>
-            Không tìm thấy phòng trọ nào khớp với yêu cầu của bạn.
-            <br> <a href="/Room/Search" class="btn btn-outline-secondary mt-3 rounded-pill">Xóa bộ lọc</a>
+        <div class="alert alert-info border-0 shadow-sm text-center py-5 rounded-4 mt-4 bg-white">
+            @if (isAIRecommendation)
+            {
+                <i class="bi bi-emoji-frown fs-1 text-muted d-block mb-3"></i>
+                <h4 class="fw-bold text-dark">Không có phòng phù hợp với sở thích của bạn</h4>
+                <p class="text-muted">Hãy thử thay đổi sở thích hoặc bớt khắt khe hơn một chút nhé!</p>
+                <a href="/Profile/Onboarding" class="btn text-white fw-bold px-4 py-2 mt-3 rounded-pill shadow-sm" style="background-color: #009688;">
+                    <i class="bi bi-arrow-repeat"></i> Chọn lại sở thích
+                </a>
+            }
+            else
+            {
+                <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+                <h4 class="fw-bold">Không tìm thấy phòng trọ nào phù hợp với yêu cầu của bạn.</h4>
+            }
         </div>
     }
     else
@@ -114,7 +130,7 @@
                     <a class="text-decoration-none" asp-controller="Room" asp-action="Detail" asp-route-id="@r.Id">
                         <div class="card h-100 room-card shadow-sm border-0">
                             <div class="position-relative">
-                                <img src="@image" class="card-img-top w-100" style="height:220px; object-fit:cover" alt="Ảnh phòng" />
+                                <img src="@image" class="card-img-top w-100" style="height:220px; object-fit:cover" alt="Ảnh phòng" onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/400/300';" />
                                 <span class="badge @(r.PostType == "Room" ? "bg-warning text-dark" : "bg-success") position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow">
                                     <i class="bi @(r.PostType == "Room" ? "bi-house-door" : "bi-people")"></i>
                                     @(r.PostType == "Room" ? "Cho thuê" : "Tìm ở ghép")

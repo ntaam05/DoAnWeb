@@ -21,7 +21,6 @@ public class ProfileController : Controller
         _context = context;
     }
 
-    // TRANG XEM HỒ SƠ (Cho cả Chủ trọ và Người thuê)
     public IActionResult Index()
     {
         var email = HttpContext.Session.GetString(CURRENT_EMAIL);
@@ -33,7 +32,6 @@ public class ProfileController : Controller
         return View(user);
     }
 
-    // TRANG CHỈNH SỬA (Cho cả Chủ trọ và Người thuê)
     public IActionResult Edit()
     {
         var email = HttpContext.Session.GetString(CURRENT_EMAIL);
@@ -59,31 +57,23 @@ public class ProfileController : Controller
         user.Gender = (gender ?? "").Trim();
         user.Hometown = (hometown ?? "").Trim();
 
-        // XỬ LÝ ẢNH ĐÃ CẮT (Dạng Base64 từ Cropper.js)
         if (!string.IsNullOrEmpty(croppedAvatar) && croppedAvatar.Contains(","))
         {
             try
             {
-                // Tách chuỗi base64 (bỏ phần data:image/jpeg;base64,)
                 string base64Data = croppedAvatar.Split(',')[1];
                 byte[] imageBytes = Convert.FromBase64String(base64Data);
 
-                // Tạo tên file duy nhất
                 string fileName = $"avt_{Guid.NewGuid():N}.jpg";
                 string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
 
                 if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 
                 string filePath = Path.Combine(folderPath, fileName);
-
-                // Xóa ảnh cũ nếu có
                 DeleteLocalFile(user.AvatarUrl);
-
-                // Lưu file mới
                 System.IO.File.WriteAllBytes(filePath, imageBytes);
                 user.AvatarUrl = $"/uploads/avatars/{fileName}";
 
-                // Đồng bộ ảnh vào các bảng liên quan nếu là Người thuê
                 UpdateTenantAvatarAcrossRooms(user.Email, user.AvatarUrl);
             }
             catch (Exception ex)
@@ -93,8 +83,6 @@ public class ProfileController : Controller
         }
 
         _context.SaveChanges();
-
-        // CẬP NHẬT SESSION ĐỂ NAVBAR ĐỔI NGAY LẬP TỨC
         HttpContext.Session.SetString(CURRENT_AVATAR, user.AvatarUrl ?? "");
         HttpContext.Session.SetString(CURRENT_NAME, string.IsNullOrWhiteSpace(user.FullName) ? user.Email.Split('@')[0] : user.FullName);
 
@@ -102,7 +90,6 @@ public class ProfileController : Controller
         return RedirectToAction("Index");
     }
 
-    // CHỈ NGƯỜI THUÊ MỚI CÓ QUYỀN DÙNG MÃ THAM GIA PHÒNG
     [HttpPost]
     public IActionResult JoinRoomByCode(string joinCode)
     {
@@ -146,18 +133,66 @@ public class ProfileController : Controller
         return RedirectToAction("Index");
     }
 
-    // Helper: Cập nhật ảnh đại diện ở các phòng đang ở
     private void UpdateTenantAvatarAcrossRooms(string email, string avatarUrl)
     {
         var tenants = _context.RoomTenants.Where(t => t.Email == email).ToList();
         foreach (var t in tenants) t.AvatarUrl = avatarUrl;
     }
 
-    // Helper: Xóa file vật lý
     private void DeleteLocalFile(string? relativePath)
     {
         if (string.IsNullOrWhiteSpace(relativePath) || !relativePath.StartsWith("/uploads/")) return;
         var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath.TrimStart('/'));
         if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
+    }
+
+    // =========================================================
+    // TRANG CHỌN TAG SỞ THÍCH (DÙNG ĐÚNG BẢNG UserAccounts)
+    // =========================================================
+    public IActionResult Onboarding()
+    {
+        var email = HttpContext.Session.GetString(CURRENT_EMAIL);
+
+        if (string.IsNullOrEmpty(email) && User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            email = User.Identity.Name;
+            HttpContext.Session.SetString(CURRENT_EMAIL, email!);
+            var userAcc = _context.UserAccounts.FirstOrDefault(u => u.Email == email);
+            if (userAcc != null)
+            {
+                HttpContext.Session.SetString(CURRENT_TYPE, userAcc.UserType ?? "Tenant");
+                HttpContext.Session.SetString(CURRENT_NAME, userAcc.FullName ?? "");
+                HttpContext.Session.SetString(CURRENT_AVATAR, userAcc.AvatarUrl ?? "https://i.pravatar.cc/150?img=3");
+            }
+            else
+            {
+                HttpContext.Session.SetString(CURRENT_TYPE, "Tenant");
+            }
+        }
+
+        if (string.IsNullOrEmpty(email)) return Redirect("/Identity/Account/Login");
+
+        // Đã sửa thành UserAccounts
+        var user = _context.UserAccounts.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
+        ViewBag.CurrentTags = user?.LifestyleTags ?? "";
+
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult SaveOnboarding(string LifestyleTags)
+    {
+        var email = HttpContext.Session.GetString(CURRENT_EMAIL) ?? User.Identity?.Name;
+        if (string.IsNullOrEmpty(email)) return Redirect("/Identity/Account/Login");
+
+        // Đã sửa thành UserAccounts
+        var user = _context.UserAccounts.FirstOrDefault(x => x.Email.ToLower() == email.ToLower());
+        if (user != null)
+        {
+            user.LifestyleTags = LifestyleTags;
+            _context.SaveChanges();
+        }
+
+        return RedirectToAction("RecommendedRooms", "Room");
     }
 }

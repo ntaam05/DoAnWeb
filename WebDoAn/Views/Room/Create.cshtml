@@ -10,7 +10,7 @@
 
             <form asp-action="Create" method="post" enctype="multipart/form-data" class="card shadow-sm border-0 rounded-4 p-4" id="createRoomForm">
 
-                <h5 class="fw-bold mb-3 border-bottom pb-2">Thông tin cơ bản</h5>
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Thông-tin cơ bản</h5>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Tiêu đề bài đăng <span class="text-danger">*</span></label>
                     <input asp-for="Title" class="form-control focus-teal" placeholder="VD: Phòng trọ ban công thoáng mát..." required />
@@ -65,6 +65,17 @@
                         </div>
                     </div>
 
+                    <div class="mb-2 mt-3">
+                        <strong class="d-block mb-1 text-teal small">Môi trường & Lối sống (Dùng cho AI Matching):</strong>
+                        <div class="d-flex flex-wrap gap-2" id="hashtag-lifestyle">
+                            @foreach (var tag in new[] { "Sạch sẽ", "Ngủ sớm", "Cú đêm", "Không hút thuốc", "Ít nấu ăn", "Hay nấu ăn", "Yêu động vật", "Hướng nội", "Hướng ngoại", "Hay đi chơi", "Thích yên tĩnh", "Thích thể thao", "Thường xuyên vắng nhà", "Không chung chủ", "An ninh tốt", "Gần siêu thị", "Có cửa sổ" })
+                            {
+                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
+                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
+                            }
+                        </div>
+                    </div>
+
                     <input type="hidden" asp-for="Hashtags" id="HashtagsInput" />
                 </div>
 
@@ -89,10 +100,25 @@
 </div>
 
 <style>
-    .btn-teal { background-color: var(--primary-teal); color: white; border: none; }
-    .btn-teal:hover { background-color: var(--primary-teal-hover); color: white; }
-    .focus-teal:focus { border-color: var(--primary-teal); box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25); }
-    .text-teal { color: var(--primary-teal); }
+    .btn-teal {
+        background-color: var(--primary-teal);
+        color: white;
+        border: none;
+    }
+
+        .btn-teal:hover {
+            background-color: var(--primary-teal-hover);
+            color: white;
+        }
+
+    .focus-teal:focus {
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
+    }
+
+    .text-teal {
+        color: var(--primary-teal);
+    }
     /* Nút hashtag khi được chọn */
     .btn-check:checked + .btn-outline-secondary {
         background-color: var(--primary-teal);

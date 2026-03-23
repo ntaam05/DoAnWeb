@@ -5,7 +5,7 @@
     var email = Context.Session.GetString("CURRENT_USER_EMAIL");
     var type = Context.Session.GetString("CURRENT_USER_TYPE");
     var comments = ViewBag.Comments as List<WebDoAn.Models.RoomComment>;
-    double avg = ViewBag.AvgRate ?? 0.0;
+    decimal avg = ViewBag.AvgRate ?? 0.0m;
     int ratingCount = ViewBag.RatingCount ?? 0;
     bool isSaved = ViewBag.IsSaved != null && (bool)ViewBag.IsSaved;
     bool hasReviewed = ViewBag.HasReviewed != null && (bool)ViewBag.HasReviewed;

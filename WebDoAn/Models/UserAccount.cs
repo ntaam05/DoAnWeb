@@ -17,4 +17,6 @@ public class UserAccount
     public string AvatarUrl { get; set; } = "";
     public bool IsBanned { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public string? LifestyleTags { get; set; }
 }

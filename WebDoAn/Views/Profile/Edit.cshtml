@@ -19,6 +19,15 @@
         color: white;
         border: none;
     }
+    
+    .focus-teal:focus {
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
+    }
+    
+    .text-teal {
+        color: var(--primary-teal);
+    }
 </style>
 
 <div class="container py-5">
@@ -32,56 +41,72 @@
                         <div class="position-relative d-inline-block">
                             <img id="avatarPreview" src="@(Model.AvatarUrl ?? "https://i.pravatar.cc/150?img=3")"
                                  class="rounded-circle border" style="width:120px; height:120px; object-fit:cover" />
-                            <label for="avatarInput" class="btn btn-dark btn-sm rounded-circle position-absolute bottom-0 end-0">
-                                <i class="bi bi-camera"></i>
+                            <label for="avatarInput" class="position-absolute bottom-0 end-0 text-white rounded-circle p-2 shadow-sm" style="background-color: var(--primary-teal); cursor: pointer;">
+                                <i class="bi bi-camera-fill"></i>
                             </label>
+                            <input type="file" id="avatarInput" accept="image/*" class="d-none" />
+                            <input type="hidden" id="croppedAvatarData" name="croppedAvatar" />
                         </div>
-                        <input type="file" id="avatarInput" class="d-none" accept="image/*" />
-                        <input type="hidden" name="croppedAvatar" id="croppedAvatarData" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold small">Họ và tên (Biệt danh)</label>
-                        <input name="fullName" class="form-control rounded-pill bg-light border-0 px-4 py-2" value="@Model.FullName" required />
+                        <label class="form-label fw-semibold">Họ và tên</label>
+                        <input type="text" name="fullName" class="form-control focus-teal" value="@Model.FullName" required />
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold small">Năm sinh</label>
-                            <input name="birthYear" class="form-control rounded-pill bg-light border-0 px-4" value="@Model.BirthYear" />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Năm sinh</label>
+                            <input type="number" name="birthYear" class="form-control focus-teal" value="@Model.BirthYear" required />
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold small">Giới tính</label>
-                            <select name="gender" class="form-select rounded-pill bg-light border-0 px-4">
-                                <option value="Nam" selected="@(Model.Gender == "Nam")">Nam</option>
-                                <option value="Nữ" selected="@(Model.Gender == "Nữ")">Nữ</option>
-                                <option value="Khác" selected="@(Model.Gender == "Khác")">Khác</option>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giới tính</label>
+                            <select name="gender" class="form-select focus-teal" required>
+                                <option value="Nam" @@(Model.Gender == "Nam" ? "selected" : "")>Nam</option>
+                                <option value="Nữ" @@(Model.Gender == "Nữ" ? "selected" : "")>Nữ</option>
+                                <option value="Khác" @@(Model.Gender == "Khác" ? "selected" : "")>Khác</option>
                             </select>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-teal w-100 py-3 rounded-pill fw-bold shadow-sm mt-3">LƯU THAY ĐỔI</button>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Quê quán</label>
+                        <input type="text" name="hometown" class="form-control focus-teal" value="@Model.Hometown" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-teal w-100 py-3 fw-bold rounded-pill shadow-sm">
+                        LƯU THAY ĐỔI
+                    </button>
                 </form>
+
+                <div class="mt-5 p-4 bg-light rounded-4 text-center border shadow-sm">
+                    <h5 class="fw-bold text-teal mb-2"><i class="bi bi-tags"></i> Quản lý Sở thích & Yêu cầu</h5>
+                    <p class="text-muted small">Bạn muốn đổi gu tìm phòng? Hãy cập nhật lại các thẻ thói quen để thuật toán AI gợi ý phòng chính xác hơn nhé.</p>
+                    <a href="/Profile/Onboarding" class="btn btn-outline-secondary fw-bold rounded-pill px-4 py-2 mt-2 shadow-sm">
+                        <i class="bi bi-magic text-warning"></i> Chọn lại thẻ sở thích
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="cropperModal" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-            <div class="modal-header border-0">
-                <h5 class="fw-bold">Cắt ảnh đại diện 1:1</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel">Cắt ảnh đại diện</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-0">
-                <div class="img-container bg-light">
-                    <img id="imageToCrop" src="">
+            <div class="modal-body text-center">
+                <div class="img-container">
+                    <img id="imageToCrop" src="" alt="Chưa có ảnh" />
                 </div>
             </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-teal rounded-pill px-4" id="cropButton">Cắt và Sử dụng</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-teal" id="cropButton">Cắt và Sử dụng</button>
             </div>
         </div>
     </div>
@@ -94,23 +119,22 @@
         const imageToCrop = document.getElementById('imageToCrop');
         const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'));
 
-        // Khi người dùng chọn file
-        avatarInput.addEventListener('change', function(e) {
+        avatarInput.addEventListener('change', function (e) {
             const files = e.target.files;
             if (files && files.length > 0) {
                 const reader = new FileReader();
-                reader.onload = function() {
-                    imageToCrop.src = reader.result;
+                reader.onload = function (event) {
+                    imageToCrop.src = event.target.result;
                     cropperModal.show();
                 };
                 reader.readAsDataURL(files[0]);
+                avatarInput.value = ''; 
             }
         });
 
-        // Khởi tạo Cropper khi Modal hiện lên
         document.getElementById('cropperModal').addEventListener('shown.bs.modal', function () {
             cropper = new Cropper(imageToCrop, {
-                aspectRatio: 1, // Bắt buộc khung vuông 1:1
+                aspectRatio: 1, 
                 viewMode: 1,
                 dragMode: 'move',
                 autoCropArea: 1,
@@ -119,29 +143,24 @@
                 center: true,
                 highlight: false,
                 cropBoxMovable: true,
-                cropBoxResizable: false, // Giữ cố định tỉ lệ
+                cropBoxResizable: false, 
                 toggleDragModeOnDblclick: false,
             });
         });
 
-        // Hủy cropper khi đóng modal để tránh rác bộ nhớ
         document.getElementById('cropperModal').addEventListener('hidden.bs.modal', function () {
             if(cropper) {
                 cropper.destroy();
             }
         });
 
-        // Khi nhấn nút "Cắt và Sử dụng"
         document.getElementById('cropButton').onclick = function() {
             const canvas = cropper.getCroppedCanvas({
                 width: 400,
                 height: 400,
             });
 
-            // Chuyển kết quả thành chuỗi Base64
             const base64Image = canvas.toDataURL('image/jpeg');
-
-            // Hiển thị xem trước và gán vào input ẩn
             document.getElementById('avatarPreview').src = base64Image;
             document.getElementById('croppedAvatarData').value = base64Image;
 

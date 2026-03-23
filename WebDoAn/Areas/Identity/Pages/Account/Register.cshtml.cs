@@ -301,7 +301,16 @@ namespace WebDoAn.Areas.Identity.Pages.Account
             HttpContext.Session.SetString("CURRENT_USER_EMAIL", email);
             HttpContext.Session.SetString("CURRENT_USER_TYPE", userType);
 
-            return LocalRedirect(returnUrl);
+            // NẾU LÀ NGƯỜI THUÊ -> CHUYỂN SANG TRANG CHỌN TAG AI
+            if (Input.UserType == "Tenant")
+            {
+                return Redirect("/Profile/Onboarding");
+            }
+            // NẾU LÀ CHỦ TRỌ -> VỀ THẲNG TRANG CHỦ HOẶC QUẢN LÝ PHÒNG
+            else
+            {
+                return LocalRedirect(returnUrl ?? "~/");
+            }
         }
 
         private void SendConfirmMail(string toEmail, string code)

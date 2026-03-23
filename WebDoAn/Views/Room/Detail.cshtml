@@ -15,171 +15,325 @@
         : new List<string> { "https://picsum.photos/seed/defaultroom/900/500" };
 }
 
-<div class="row g-4">
-    <div class="col-lg-7">
-        <div id="roomCarousel" class="carousel slide" data-bs-ride="carousel">
-            @if (images.Count > 1)
-            {
-                <div class="carousel-indicators">
-                    @for (int i = 0; i < images.Count; i++)
-                    {
-                        <button type="button" data-bs-target="#roomCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></button>
-                    }
-                </div>
-            }
+@* HÀM TÍNH THỜI GIAN THỰC CHO BÌNH LUẬN & BÀI ĐĂNG *@
+@functions {
+#nullable disable
+    public string GetRelativeTime(DateTime time)
+    {
+        var ts = DateTime.Now - time;
+        if (ts.TotalSeconds < 60) return "Vừa xong";
+        if (ts.TotalMinutes < 60) return $"{(int)ts.TotalMinutes} phút trước";
+        if (ts.TotalHours < 24) return $"{(int)ts.TotalHours} giờ trước";
+        if (ts.TotalDays < 30) return $"{(int)ts.TotalDays} ngày trước";
+        if (ts.TotalDays < 365) return $"{(int)(ts.TotalDays / 30)} tháng trước";
+        return $"{(int)(ts.TotalDays / 365)} năm trước";
+    }
+#nullable restore
+}
 
-            <div class="carousel-inner bg-light rounded shadow-sm border">
-                @for (int i = 0; i < images.Count; i++)
-                {
-                    <div class="carousel-item @(i == 0 ? "active" : "")">
-                        <img src="@images[i]"
-                             class="d-block w-100"
-                             style="height: 450px; object-fit: contain; background-color: #e9ecef;"
-                             alt="Ảnh phòng @(i + 1)"
-                             onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/900/500';" />
-                    </div>
-                }
+<style>
+    :root {
+        --primary-teal: #009688;
+        --primary-teal-hover: #00796b;
+    }
+
+    .text-teal {
+        color: var(--primary-teal) !important;
+    }
+
+    .bg-teal {
+        background-color: var(--primary-teal) !important;
+    }
+
+    .btn-teal {
+        background-color: var(--primary-teal);
+        color: white;
+        border: none;
+        transition: 0.2s;
+    }
+
+        .btn-teal:hover {
+            background-color: var(--primary-teal-hover);
+            color: white;
+        }
+
+    .focus-teal:focus {
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
+    }
+
+    .review-card {
+        border-left: 4px solid var(--primary-teal) !important;
+        transition: transform 0.2s ease;
+    }
+
+        .review-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .carousel-item img {
+        height: 450px;
+        object-fit: contain; /* HIỂN THỊ FULL ẢNH NHƯ BẠN YÊU CẦU */
+        background-color: #e9ecef;
+    }
+
+    /* Style khối tác giả giống Facebook */
+    .author-badge {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+</style>
+
+<div class="container py-4 mb-5">
+
+    <div class="d-flex align-items-center mb-4 pb-3 border-bottom ms-md-5 ps-md-2">
+        <img src="@ViewBag.OwnerAvatar"
+             class="rounded-circle me-3 shadow-sm border border-2 border-white"
+             style="width: 48px; height: 48px; object-fit: cover;"
+             alt="Avatar"
+             onerror="this.onerror=null;this.src='https://i.pravatar.cc/150?img=3';" />
+        <div>
+            <div class="fw-bold text-dark fs-6 mb-1 d-flex align-items-center">
+                @ViewBag.OwnerName
+                <i class="bi bi-check-circle-fill text-success ms-2" style="font-size: 0.9rem;" title="Chủ bài đăng"></i>
             </div>
-
-            @if (images.Count > 1)
-            {
-                <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            }
+            <div class="text-muted small">
+                @GetRelativeTime(Model.CreatedAt)
+                <span class="mx-1 fw-bold">•</span>
+                <i class="bi bi-globe-americas"></i> Công khai
+            </div>
         </div>
     </div>
 
-    <div class="col-lg-5">
-        <h2 class="fw-bold">@Model.Title</h2>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div id="roomCarousel" class="carousel slide" data-bs-ride="carousel">
+                    @if (images.Count > 1)
+                    {
+                        <div class="carousel-indicators">
+                            @for (int i = 0; i < images.Count; i++)
+                            {
+                                <button type="button" data-bs-target="#roomCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></button>
+                            }
+                        </div>
+                    }
 
-        <div class="fs-4 fw-bold text-danger mb-3">
-            @String.Format("{0:N0} đ", Model.Price) <small class="text-muted fs-6">/tháng</small>
-        </div>
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < images.Count; i++)
+                        {
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@images[i]" class="d-block w-100" alt="Ảnh phòng @(i + 1)" onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/900/500';" />
+                            </div>
+                        }
+                    </div>
 
-        @if (!string.IsNullOrEmpty(Model.Hashtags))
-        {
-            <div class="mb-3 d-flex flex-wrap gap-2">
-                @foreach (var tag in Model.Hashtags.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    @if (images.Count > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-2 shadow" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon bg-dark rounded-circle p-2 shadow" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold text-teal mb-3"><i class="bi bi-card-text me-2"></i>Mô tả chi tiết</h5>
+                <p class="text-secondary" style="line-height: 1.7; white-space: pre-wrap;">@Model.Description</p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold text-teal mb-3"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Vị trí bản đồ</h5>
+                @if (!string.IsNullOrWhiteSpace(Model.MapLink))
                 {
-                    <span class="badge bg-light text-dark border border-info rounded-pill px-3 py-2 shadow-sm">
-                        <i class="bi bi-tag-fill text-teal me-1"></i>@tag
-                    </span>
+                    @if (Model.MapLink.Contains("<iframe"))
+                    {
+                        <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-sm border">
+                            @Html.Raw(Model.MapLink)
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="@Model.MapLink" target="_blank" class="btn btn-outline-danger rounded-pill fw-bold py-2 mt-2">
+                            <i class="bi bi-map me-2"></i> Mở xem định vị trên Google Maps
+                        </a>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted p-5 bg-light rounded-4 border border-dashed">
+                        <i class="bi bi-map-fill fs-1 d-block mb-2 opacity-25"></i>
+                        <span>Chủ phòng chưa cung cấp định vị bản đồ.</span>
+                    </div>
                 }
             </div>
-        }
+        </div>
 
-        <p class="mt-3 fs-5">@Model.Description</p>
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 position-sticky" style="top: 20px;">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <span class="badge @(Model.PostType == "Room" ? "bg-warning text-dark" : "bg-success") px-3 py-2 rounded-pill fs-6 shadow-sm">
+                        <i class="bi @(Model.PostType == "Room" ? "bi-house-door" : "bi-people") me-1"></i>
+                        @(Model.PostType == "Room" ? "Cho thuê" : "Tìm ở ghép")
+                    </span>
+                    <div class="text-end">
+                        <div class="fs-6 text-muted">Mã tin: #@Model.Id</div>
+                    </div>
+                </div>
 
-        <div class="mt-4 mb-4 p-3 bg-light rounded shadow-sm border border-light">
-            <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-danger fs-5 me-1"></i> Vị trí Bản đồ</h6>
-            @if (!string.IsNullOrWhiteSpace(Model.MapLink))
-            {
-                @if (Model.MapLink.Contains("<iframe"))
+                <div class="fs-2 fw-bold text-danger mb-4">
+                    @String.Format("{0:N0} đ", Model.Price) <span class="text-muted fs-6 fw-normal">/tháng</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Hashtags))
                 {
-                    <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm">
-                        @Html.Raw(Model.MapLink)
+                    <div class="mb-4 d-flex flex-wrap gap-2">
+                        @foreach (var tag in Model.Hashtags.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <span class="badge bg-light text-teal border border-info rounded-pill px-3 py-2 shadow-sm">
+                                @tag
+                            </span>
+                        }
+                    </div>
+                }
+
+                <div class="d-flex align-items-center gap-3 mb-4 bg-light p-3 rounded-4 border">
+                    <div class="fs-4 fw-bold text-warning">@avg <i class="bi bi-star-fill"></i></div>
+                    <div class="text-muted border-start ps-3">Dựa trên <strong>@ratingCount</strong> lượt đánh giá từ người thuê.</div>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    <a asp-action="Discuss" asp-route-id="@Model.Id" class="btn btn-teal w-100 fw-bold py-3 rounded-pill shadow-sm fs-5">
+                        <i class="bi bi-chat-dots-fill me-2"></i> THAM GIA THẢO LUẬN
+                    </a>
+
+                    @if (!string.IsNullOrEmpty(email))
+                    {
+                        @if (!isSaved)
+                        {
+                            <form method="post" asp-action="SaveRoom">
+                                <input type="hidden" name="roomId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-outline-danger w-100 fw-bold py-3 rounded-pill shadow-sm fs-5">
+                                    <i class="bi bi-heart me-2"></i> LƯU PHÒNG NÀY
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-action="UnsaveRoom">
+                                <input type="hidden" name="roomId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-danger w-100 fw-bold py-3 rounded-pill shadow-sm fs-5">
+                                    <i class="bi bi-heart-fill me-2"></i> ĐÃ LƯU PHÒNG
+                                </button>
+                            </form>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5 opacity-10" />
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-2">
+                <h4 class="fw-bold text-teal m-0"><i class="bi bi-stars text-warning me-2"></i>Đánh giá & Nhận xét</h4>
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">@ratingCount lượt đánh giá</span>
+            </div>
+
+            @if (TempData["AuthError"] != null)
+            {
+                <div class="alert alert-warning rounded-4 shadow-sm border-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["AuthError"]</div>
+            }
+
+            @if (email != null && type == "Tenant")
+            {
+                @if (!hasReviewed)
+                {
+                    <div class="card border-0 shadow-sm rounded-4 bg-light mb-5">
+                        <div class="card-body p-4">
+                            <form method="post" asp-action="AddComment" asp-route-id="@Model.Id">
+                                <h6 class="fw-bold mb-3">Viết đánh giá của bạn</h6>
+                                <div class="mb-3">
+                                    <select name="rating" class="form-select focus-teal rounded-pill" required>
+                                        <option value="">-- Chọn số sao đánh giá --</option>
+                                        <option value="5">⭐⭐⭐⭐⭐ - Rất tốt, khuyên thuê</option>
+                                        <option value="4">⭐⭐⭐⭐ - Tốt, phòng ổn</option>
+                                        <option value="3">⭐⭐⭐ - Bình thường, tạm chấp nhận</option>
+                                        <option value="2">⭐⭐ - Tệ, nhiều vấn đề</option>
+                                        <option value="1">⭐ - Rất tệ, nên tránh</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <textarea name="content" class="form-control focus-teal rounded-4" rows="3" placeholder="Nhận xét chi tiết về an ninh, chủ trọ, tiện ích..." required></textarea>
+                                </div>
+                                <div class="text-end">
+                                    <button class="btn btn-teal rounded-pill px-5 py-2 fw-bold shadow-sm">
+                                        <i class="bi bi-send-fill me-2"></i> Gửi đánh giá
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 }
                 else
                 {
-                    <a href="@Model.MapLink" target="_blank" class="btn btn-outline-danger w-100 fw-bold py-2">
-                        <i class="bi bi-map me-2"></i> Mở xem định vị trên Google Maps
-                    </a>
+                    <div class="alert alert-info rounded-4 shadow-sm border-0 mb-5 text-center">
+                        <i class="bi bi-check-circle-fill fs-4 d-block mb-2 text-success"></i>
+                        Bạn đã để lại đánh giá cho phòng này. Cảm ơn sự đóng góp của bạn!
+                    </div>
                 }
+            }
+
+            @if (comments != null && comments.Count > 0)
+            {
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var c in comments.OrderByDescending(x => x.CreatedAt))
+                    {
+                        <div class="card border-0 shadow-sm rounded-4 review-card">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="fw-bold text-dark d-flex align-items-center">
+                                        <div class="bg-teal text-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 35px; height: 35px;">
+                                            @c.UserEmail.Substring(0, 1).ToUpper()
+                                        </div>
+                                        @c.UserEmail.Split('@')[0]
+                                    </div>
+                                    <div class="text-muted small"><i class="bi bi-clock me-1"></i>@GetRelativeTime(c.CreatedAt)</div>
+                                </div>
+
+                                <div class="text-warning mb-2" style="font-size: 0.9rem;">
+                                    @for (int s = 0; s < c.Rating; s++)
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                    @for (int s = c.Rating.Value; s < 5; s++)
+                                    {
+                                        <i class="bi bi-star text-muted opacity-25"></i>
+                                    }
+                                </div>
+
+                                <p class="mb-0 text-secondary" style="line-height: 1.6;">@c.Content</p>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
             else
             {
-                <div class="text-center text-muted p-3 bg-white rounded">
-                    <i class="bi bi-map-fill fs-2 d-block mb-2 opacity-50"></i>
-                    <span class="small">Chủ phòng chưa cung cấp định vị bản đồ.</span>
+                <div class="text-center py-5 bg-light rounded-4 border border-dashed">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" style="width: 80px; opacity: 0.3;" class="mb-3" />
+                    <p class="text-muted fst-italic m-0">Chưa có đánh giá nào cho phòng này.</p>
                 </div>
             }
         </div>
-
-        <div class="mt-3 mb-3 fs-5">
-            ⭐ <b>@avg</b> / 5 Đánh giá <span class="text-muted">(@ratingCount lượt)</span>
-        </div>
-
-        @if (!string.IsNullOrEmpty(email))
-        {
-            @if (!isSaved)
-            {
-                <form method="post" asp-action="SaveRoom">
-                    <input type="hidden" name="roomId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-outline-danger w-100 fw-bold py-3 fs-5 rounded-pill"><i class="bi bi-heart"></i> LƯU TIN NÀY</button>
-                </form>
-            }
-            else
-            {
-                <form method="post" asp-action="UnsaveRoom">
-                    <input type="hidden" name="roomId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-danger w-100 fw-bold py-3 fs-5 rounded-pill shadow-sm"><i class="bi bi-heart-fill"></i> ĐÃ LƯU (BỎ LƯU)</button>
-                </form>
-            }
-        }
     </div>
 </div>
-
-<hr class="my-5" />
-
-<h4>Bình luận & Đánh giá</h4>
-
-@if (TempData["AuthError"] != null)
-{
-    <div class="alert alert-warning">@TempData["AuthError"]</div>
-}
-
-@if (email != null && type == "Tenant")
-{
-    @if (!hasReviewed)
-    {
-        <form method="post" asp-action="AddComment" asp-route-id="@Model.Id" class="mb-4">
-            <div class="mb-2">
-                <textarea name="content" class="form-control focus-teal" placeholder="Nhận xét trải nghiệm của bạn..." required></textarea>
-            </div>
-            <div class="mb-2">
-                <select name="rating" class="form-select focus-teal" required>
-                    <option value="">Chọn số sao</option>
-                    <option value="5">⭐⭐⭐⭐⭐ - Rất tốt</option>
-                    <option value="4">⭐⭐⭐⭐ - Tốt</option>
-                    <option value="3">⭐⭐⭐ - Bình thường</option>
-                    <option value="2">⭐⭐ - Tệ</option>
-                    <option value="1">⭐ - Rất tệ</option>
-                </select>
-            </div>
-            <button class="btn text-white fw-bold px-4" style="background-color: var(--primary-teal);">Gửi đánh giá</button>
-        </form>
-    }
-    else
-    {
-        <div class="alert alert-info">Bạn đã đánh giá phòng này rồi. Mỗi email chỉ được đánh giá 1 lần.</div>
-    }
-}
-
-@if (comments != null && comments.Count > 0)
-{
-    @foreach (var c in comments.OrderByDescending(x => x.CreatedAt))
-    {
-        <div class="border rounded p-3 mb-3 shadow-sm bg-light">
-            <div class="fw-bold text-teal"><i class="bi bi-person-circle me-2"></i>@c.UserEmail</div>
-            <div class="text-warning my-1">
-                @for (int s = 0; s < c.Rating; s++)
-                {
-                    <span>⭐</span>
-                }
-            </div>
-            <div>@c.Content</div>
-            <div class="text-muted small mt-2"><i class="bi bi-clock me-1"></i>@c.CreatedAt</div>
-        </div>
-    }
-}
-else
-{
-    <div class="text-muted fst-italic">Chưa có đánh giá nào cho phòng này.</div>
-}

@@ -87,11 +87,13 @@
         flex: 0 0 calc(33.333% - 1rem);
         scroll-snap-align: start;
     }
+
     @@media (max-width: 991px) {
         .room-slide {
             flex: 0 0 calc(50% - 0.75rem);
         }
     }
+
     @@media (max-width: 767px) {
         .room-slide {
             flex: 0 0 100%;
@@ -158,6 +160,7 @@
         animation: textPop 1.3s ease-in-out forwards;
         filter: drop-shadow(0px 4px 15px rgba(240, 66, 255, 0.3));
     }
+
     @@keyframes fadeOverlay {
         0% {
             opacity: 0;
@@ -176,6 +179,7 @@
             visibility: hidden;
         }
     }
+
     @@keyframes textPop {
         0% {
             transform: scale(0.8);
@@ -354,7 +358,7 @@
             </button>
 
             <div class="room-slider" id="roomSlider">
-                @foreach (var r in Model.Take(12))
+                @foreach (var r in Model.OrderByDescending(x => x.CreatedAt).Take(12))
                 {
                     var images = r.ImageUrls ?? new List<string>();
                     var image = images.FirstOrDefault() ?? "https://picsum.photos/seed/defaultroom/400/300";

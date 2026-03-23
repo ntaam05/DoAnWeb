@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebDoAn.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -119,7 +119,8 @@ namespace WebDoAn.Migrations
                     Hometown = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsBanned = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LifestyleTags = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -240,7 +241,7 @@ namespace WebDoAn.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RoomPostId = table.Column<int>(type: "int", nullable: false),
                     ReplyToCommentId = table.Column<int>(type: "int", nullable: true)

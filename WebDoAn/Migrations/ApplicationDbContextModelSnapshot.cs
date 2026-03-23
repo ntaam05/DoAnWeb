@@ -298,6 +298,9 @@ namespace WebDoAn.Migrations
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
 
+                    b.Property<string>("Reaction")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("ReplyToCommentId")
                         .HasColumnType("int");
 

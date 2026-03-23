@@ -12,8 +12,8 @@ using WebDoAn.Data;
 namespace WebDoAn.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260322152904_AddUserEmailColumn")]
-    partial class AddUserEmailColumn
+    [Migration("20260323033958_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -457,6 +457,9 @@ namespace WebDoAn.Migrations
 
                     b.Property<bool>("IsBanned")
                         .HasColumnType("bit");
+
+                    b.Property<string>("LifestyleTags")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()

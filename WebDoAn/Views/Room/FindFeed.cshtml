@@ -1,6 +1,24 @@
 ﻿@model List<WebDoAn.Models.RoomPost>
+@using Microsoft.AspNetCore.Http
 @{
     ViewData["Title"] = "Tìm người ở ghép";
+    var userType = Context.Session.GetString("CURRENT_USER_TYPE");
+}
+
+@* HÀM TÍNH THỜI GIAN THỰC *@
+@functions {
+#nullable disable
+    public string GetRelativeTime(DateTime time)
+    {
+        var ts = DateTime.Now - time;
+        if (ts.TotalSeconds < 60) return "Vừa xong";
+        if (ts.TotalMinutes < 60) return $"{(int)ts.TotalMinutes} phút trước";
+        if (ts.TotalHours < 24) return $"{(int)ts.TotalHours} giờ trước";
+        if (ts.TotalDays < 30) return $"{(int)ts.TotalDays} ngày trước";
+        if (ts.TotalDays < 365) return $"{(int)(ts.TotalDays / 30)} tháng trước";
+        return $"{(int)(ts.TotalDays / 365)} năm trước";
+    }
+#nullable restore
 }
 
 <style>
@@ -45,9 +63,20 @@
             <h2 class="fw-bold m-0 text-dark"><i class="bi bi-people-fill text-teal me-2"></i>Cộng đồng tìm trọ</h2>
             <p class="text-muted m-0 mt-1">Kết nối với những người bạn có cùng nhu cầu thuê phòng.</p>
         </div>
-        <a class="btn btn-teal fw-bold rounded-pill px-4 py-2" style="background-color: var(--primary-teal); color:white;" asp-controller="Room" asp-action="CreateFind">
-            <i class="bi bi-pencil-square me-1"></i> Đăng tin tìm người
-        </a>
+
+        @* NÚT ĐĂNG TIN THÔNG MINH (Tránh lỗi đá văng ra ngoài) *@
+        @if (userType == "Tenant")
+        {
+            <a class="btn btn-teal fw-bold rounded-pill px-4 py-2" style="background-color: var(--primary-teal); color:white;" asp-controller="Room" asp-action="CreateFind">
+                <i class="bi bi-pencil-square me-1"></i> Đăng tin tìm người
+            </a>
+        }
+        else if (string.IsNullOrEmpty(userType))
+        {
+            <a class="btn btn-outline-teal fw-bold rounded-pill px-4 py-2" href="/Identity/Account/Login">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập để đăng tin
+            </a>
+        }
     </div>
 
     @if (Model.Count == 0)
@@ -73,7 +102,10 @@
                                     </div>
                                     <div>
                                         <h6 class="fw-bold text-dark m-0 line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@p.Title</h6>
-                                        <small class="text-muted"><i class="bi bi-clock me-1"></i>Vừa cập nhật</small>
+
+                                        @* ĐÃ THAY ĐỔI DÒNG NÀY: HIỂN THỊ THỜI GIAN THỰC *@
+                                        <small class="text-muted"><i class="bi bi-clock me-1"></i>@GetRelativeTime(p.CreatedAt)</small>
+
                                     </div>
                                 </div>
                                 <div class="text-secondary" style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">

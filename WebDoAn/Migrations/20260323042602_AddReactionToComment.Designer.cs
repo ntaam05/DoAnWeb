@@ -12,8 +12,8 @@ using WebDoAn.Data;
 namespace WebDoAn.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260323030559_AddLifestyleTagsToUserAccount")]
-    partial class AddLifestyleTagsToUserAccount
+    [Migration("20260323042602_AddReactionToComment")]
+    partial class AddReactionToComment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -300,6 +300,9 @@ namespace WebDoAn.Migrations
 
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
+
+                    b.Property<string>("Reaction")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ReplyToCommentId")
                         .HasColumnType("int");

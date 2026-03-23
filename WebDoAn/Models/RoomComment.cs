@@ -9,6 +9,8 @@
         public DateTime CreatedAt { get; set; }
         public int RoomPostId { get; set; }
         public int? ReplyToCommentId { get; set; }
+        public string? Reaction { get; set; }
         public RoomPost? RoomPost { get; set; }
+        
     }
 }

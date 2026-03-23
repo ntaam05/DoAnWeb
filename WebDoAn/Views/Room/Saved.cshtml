@@ -4,49 +4,145 @@
     ViewData["Title"] = "Phòng đã lưu";
 }
 
-<h2 class="mb-4">Phòng đã lưu</h2>
+<style>
+    :root {
+        --primary-teal: #009688;
+        --primary-teal-hover: #00796b;
+    }
 
-@if (Model == null || Model.Count == 0)
-{
-    <div class="alert alert-info">Bạn chưa lưu phòng nào.</div>
-}
-else
-{
-    <div class="row">
-        @foreach (var room in Model)
+    .text-teal {
+        color: var(--primary-teal) !important;
+    }
+
+    .bg-teal {
+        background-color: var(--primary-teal) !important;
+    }
+
+    /* Hiệu ứng thẻ phòng đồng bộ với trang Chủ */
+    .room-card {
+        transition: all 0.3s ease;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
+
+        .room-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,150,136,0.15) !important;
+        }
+
+    .price-tag {
+        color: #e53935;
+        font-weight: 800;
+        font-size: 1.25rem;
+    }
+
+    /* Nút bấm đồng bộ */
+    .btn-teal {
+        background-color: var(--primary-teal);
+        color: white;
+        border: none;
+    }
+
+        .btn-teal:hover {
+            background-color: var(--primary-teal-hover);
+            color: white;
+        }
+
+    .btn-outline-danger {
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        transition: all 0.2s;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+</style>
+
+<div class="container py-5 mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-3 gap-3">
+        <h2 class="fw-bold text-teal m-0">
+            <i class="bi bi-bookmark-heart-fill me-2"></i> Phòng bạn đã lưu
+        </h2>
+        @if (Model != null && Model.Count > 0)
         {
-            var imageUrl = room.ImageUrls?.FirstOrDefault();
-
-            if (string.IsNullOrWhiteSpace(imageUrl))
-            {
-                imageUrl = "https://picsum.photos/seed/defaultroom/800/500";
-            }
-
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="@imageUrl"
-                         class="card-img-top"
-                         style="height:220px;object-fit:cover;"
-                         alt="Ảnh phòng"
-                         onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/800/500';" />
-
-                    <div class="card-body">
-                        <h4>@room.Title</h4>
-                        <p class="text-primary fw-bold">@String.Format("{0:N0}", room.Price) đ/tháng</p>
-                    </div>
-
-                    <div class="card-footer bg-white d-flex gap-2">
-                        <a asp-action="Detail" asp-route-id="@room.Id" class="btn btn-outline-primary flex-fill">
-                            Xem chi tiết
-                        </a>
-
-                        <form method="post" asp-action="UnsaveRoom" class="flex-fill">
-                            <input type="hidden" name="roomId" value="@room.Id" />
-                            <button type="submit" class="btn btn-danger w-100">Bỏ lưu</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <span class="badge bg-light text-teal border shadow-sm fs-6 rounded-pill px-4 py-2">
+                <i class="bi bi-house-check me-1"></i> Đã lưu @Model.Count phòng
+            </span>
         }
     </div>
-}
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="card border-0 shadow-sm rounded-4 text-center py-5 mt-4" style="background-color: #f8f9fa;">
+            <div class="card-body py-5">
+                <i class="bi bi-heartbreak-fill text-muted opacity-25 d-block mb-3" style="font-size: 5rem;"></i>
+                <h4 class="text-muted fw-bold">Danh sách yêu thích trống</h4>
+                <p class="text-muted mb-4">Bạn chưa lưu bất kỳ bài đăng nào. Hãy dạo quanh và lưu lại những căn phòng ưng ý nhé!</p>
+                <a href="/Room/Search" class="btn btn-teal rounded-pill px-5 py-3 fw-bold shadow-sm">
+                    <i class="bi bi-search me-2"></i> Khám phá phòng ngay
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var room in Model)
+            {
+                var images = room.ImageUrls ?? new List<string>();
+                var imageUrl = images.FirstOrDefault() ?? "https://picsum.photos/seed/defaultroom/800/500";
+
+                <div class="col">
+                    <div class="card h-100 room-card shadow-sm border-0">
+
+                        <a class="text-decoration-none text-dark" asp-controller="Room" asp-action="Detail" asp-route-id="@room.Id">
+                            <div class="position-relative">
+                                <img src="@imageUrl"
+                                     class="card-img-top w-100"
+                                     style="height: 220px; object-fit: cover;"
+                                     alt="Ảnh phòng"
+                                     onerror="this.onerror=null;this.src='https://picsum.photos/seed/defaultroom/400/300';" />
+
+                                <span class="badge @(room.PostType == "Room" ? "bg-warning text-dark" : "bg-success") position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                                    <i class="bi @(room.PostType == "Room" ? "bi-house-door" : "bi-people")"></i>
+                                    @(room.PostType == "Room" ? "Cho thuê" : "Tìm ở ghép")
+                                </span>
+
+                                <div class="position-absolute top-0 end-0 m-3 text-danger fs-4 shadow-sm bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                    <i class="bi bi-heart-fill"></i>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-4 pb-2">
+                                <h5 class="card-title fw-bold text-truncate mb-2" title="@room.Title">@room.Title</h5>
+                                <div class="price-tag mb-2">
+                                    @String.Format("{0:N0}", room.Price) đ <span class="fs-6 text-muted fw-normal">/tháng</span>
+                                </div>
+                                <p class="text-muted text-truncate mb-0 small" title="@room.Description">
+                                    <i class="bi bi-info-circle me-1"></i> @room.Description
+                                </p>
+                            </div>
+                        </a>
+
+                        <div class="card-footer bg-white border-0 p-4 pt-3">
+                            <form method="post" asp-action="UnsaveRoom" class="d-flex gap-2">
+                                <input type="hidden" name="roomId" value="@room.Id" />
+
+                                <a asp-action="Detail" asp-route-id="@room.Id" class="btn btn-teal flex-grow-1 rounded-pill fw-bold shadow-sm">
+                                    Chi tiết
+                                </a>
+
+                                <button type="submit" class="btn btn-outline-danger rounded-pill px-4 shadow-sm" title="Bỏ lưu phòng này" onclick="return confirm('Bạn có chắc chắn muốn bỏ lưu phòng này?');">
+                                    <i class="bi bi-trash3-fill"></i> Bỏ lưu
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -32,22 +32,33 @@ public class RoomController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(RoomPost room, List<IFormFile>? images)
+    public IActionResult Create(RoomPost room, List<string>? base64Images)
     {
         if (!IsLogin || UserType != "Landlord")
             return RedirectToAction("Index", "Home");
 
         var imageUrls = new List<string>();
 
-        if (images != null && images.Count > 0)
+        // Giải mã ảnh từ Base64 sang file JPG lưu vào server
+        if (base64Images != null && base64Images.Count > 0)
         {
             int index = 1;
-            foreach (var image in images)
+            foreach (var b64 in base64Images)
             {
-                if (image == null || image.Length == 0) continue;
-                var prefix = $"room_{Email}_{room.Title}_{index}";
-                var url = SaveUpload(image, prefix, "uploads/rooms");
-                if (!string.IsNullOrWhiteSpace(url)) imageUrls.Add(url);
+                if (string.IsNullOrWhiteSpace(b64)) continue;
+
+                // Cắt bỏ phần header "data:image/jpeg;base64,"
+                var base64Data = b64.Contains(",") ? b64.Split(',')[1] : b64;
+                byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+                var fileName = $"room_{Email}_{Slugify(room.Title)}_{index}_{Guid.NewGuid():N}.jpg";
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "rooms");
+                if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, fileName);
+                System.IO.File.WriteAllBytes(filePath, imageBytes);
+
+                imageUrls.Add($"/uploads/rooms/{fileName}");
                 index++;
             }
         }
@@ -69,7 +80,7 @@ public class RoomController : Controller
         room.JoinCode = BuildJoinCode(room.Id, room.OwnerId);
         _context.SaveChanges();
 
-        TempData["Message"] = "Đăng phòng thành công.";
+        TempData["Message"] = "Đăng phòng và xác thực vị trí thành công.";
         return RedirectToAction("MyRooms");
     }
 

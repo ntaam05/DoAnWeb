@@ -25,7 +25,6 @@
                         <th>ID</th>
                         <th>Tiêu đề</th>
                         <th>Người đăng</th>
-                        <th>Mã tham gia</th>
                         <th width="220">Hành động</th>
                     </tr>
                 </thead>
@@ -36,7 +35,6 @@
                             <td>@item.Id</td>
                             <td>@item.Title</td>
                             <td>@item.OwnerId</td>
-                            <td>@item.JoinCode</td>
                             <td>
                                 <a asp-action="ViewFindDetails" asp-route-postId="@item.Id" class="btn btn-sm btn-primary">
                                     Xem

@@ -3,14 +3,33 @@
     ViewData["Title"] = "Đăng phòng";
 }
 
+<style>
+    .btn-teal { background-color: var(--primary-teal); color: white; border: none; }
+    .btn-teal:hover { background-color: #00796b; color: white; }
+    .focus-teal:focus { border-color: var(--primary-teal); box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25); }
+    .text-teal { color: var(--primary-teal); }
+    
+    .btn-check:checked + .btn-outline-secondary { background-color: var(--primary-teal); color: white; border-color: var(--primary-teal); }
+    
+    #cameraStream { width: 100%; border-radius: 12px; background: #000; transform: scaleX(-1); /* Lật gương cho dễ chụp */ }
+    .photo-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--primary-teal); }
+</style>
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
+            <div class="alert alert-warning shadow-sm border-0 rounded-4">
+                <i class="bi bi-shield-check-fill fs-4 text-success me-2"></i>
+                <strong>Hệ thống xác thực chống lừa đảo:</strong> Bạn bắt buộc phải có mặt tại phòng trọ để chụp ảnh. Hệ thống sẽ quét GPS và đối chiếu với bản đồ!
+            </div>
+
             <h2 class="mb-4 fw-bold text-teal"><i class="bi bi-house-add"></i> Đăng Phòng Cho Thuê</h2>
 
-            <form asp-action="Create" method="post" enctype="multipart/form-data" class="card shadow-sm border-0 rounded-4 p-4" id="createRoomForm">
+            <form asp-action="Create" method="post" class="card shadow-sm border-0 rounded-4 p-4" id="createRoomForm">
+                
+                <div id="hiddenImagesContainer"></div>
 
-                <h5 class="fw-bold mb-3 border-bottom pb-2">Thông-tin cơ bản</h5>
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Thông tin cơ bản</h5>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Tiêu đề bài đăng <span class="text-danger">*</span></label>
                     <input asp-for="Title" class="form-control focus-teal" placeholder="VD: Phòng trọ ban công thoáng mát..." required />
@@ -22,142 +41,185 @@
                         <input asp-for="Price" type="number" class="form-control focus-teal" placeholder="VD: 3500000" required />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold"><i class="bi bi-geo-alt-fill text-danger"></i> Link Google Maps (Tùy chọn)</label>
-                        <input asp-for="MapLink" class="form-control focus-teal" placeholder="Dán link chia sẻ từ Google Maps vào đây..." />
-                        <small class="text-muted">Lấy từ nút "Chia sẻ" -> "Sao chép liên kết" trên Google Maps</small>
+                        <label class="form-label fw-semibold"><i class="bi bi-geo-alt-fill text-danger"></i> Link Google Maps <span class="text-danger">*</span></label>
+                        <input asp-for="MapLink" id="MapLink" class="form-control focus-teal" placeholder="Dán link chứa tọa độ..." required />
+                        <small class="text-muted">Link phải có dạng google.com/maps/place/.../@@lat,lng</small>
                     </div>
                 </div>
 
                 <h5 class="fw-bold mt-4 mb-3 border-bottom pb-2">Đặc điểm & Tiện ích (Hashtags)</h5>
                 <div class="mb-4">
-                    <p class="text-muted small mb-2">Chọn các thẻ hashtag phù hợp để người thuê dễ dàng tìm thấy phòng của bạn:</p>
-
-                    <div class="mb-2">
-                        <strong class="d-block mb-1 text-teal small">Khu vực TP.HCM:</strong>
-                        <div class="d-flex flex-wrap gap-2" id="hashtag-area">
-                            @foreach (var tag in new[] { "Quận 1", "Quận 3", "Quận 10", "Quận 7", "Bình Thạnh", "Thủ Đức", "Gò Vấp", "Tân Bình", "Phú Nhuận" })
-                            {
-                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
-                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
-                            }
-                        </div>
+                    <div class="d-flex flex-wrap gap-2" id="hashtag-area">
+                        @foreach (var tag in new[] { "Quận 1", "Quận 3", "Quận 10", "Quận 7", "Bình Thạnh", "Thủ Đức", "Gò Vấp", "Tân Bình", "Phú Nhuận", "Được nuôi Pet", "Có máy lạnh", "Giờ giấc tự do", "Ban công" })
+                        {
+                            <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
+                            <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
+                        }
                     </div>
-
-                    <div class="mb-2 mt-3">
-                        <strong class="d-block mb-1 text-teal small">Sức chứa & Đối tượng:</strong>
-                        <div class="d-flex flex-wrap gap-2" id="hashtag-people">
-                            @foreach (var tag in new[] { "1 Người", "2 Người", "3 Người", "Nam", "Nữ", "Sinh viên", "Người đi làm" })
-                            {
-                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
-                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
-                            }
-                        </div>
-                    </div>
-
-                    <div class="mb-2 mt-3">
-                        <strong class="d-block mb-1 text-teal small">Tiện ích nội khu:</strong>
-                        <div class="d-flex flex-wrap gap-2" id="hashtag-amenities">
-                            @foreach (var tag in new[] { "Được nuôi Pet", "Có máy lạnh", "Giờ giấc tự do", "Có gác lửng", "WC riêng", "Có máy giặt", "Ban công", "Chỗ để xe" })
-                            {
-                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
-                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
-                            }
-                        </div>
-                    </div>
-
-                    <div class="mb-2 mt-3">
-                        <strong class="d-block mb-1 text-teal small">Môi trường & Lối sống (Dùng cho AI Matching):</strong>
-                        <div class="d-flex flex-wrap gap-2" id="hashtag-lifestyle">
-                            @foreach (var tag in new[] { "Sạch sẽ", "Ngủ sớm", "Cú đêm", "Không hút thuốc", "Ít nấu ăn", "Hay nấu ăn", "Yêu động vật", "Hướng nội", "Hướng ngoại", "Hay đi chơi", "Thích yên tĩnh", "Thích thể thao", "Thường xuyên vắng nhà", "Không chung chủ", "An ninh tốt", "Gần siêu thị", "Có cửa sổ" })
-                            {
-                                <input type="checkbox" class="btn-check hashtag-check" id="tag_@tag" value="#@tag.Replace(" ", "")">
-                                <label class="btn btn-outline-secondary btn-sm rounded-pill" for="tag_@tag">#@tag</label>
-                            }
-                        </div>
-                    </div>
-
                     <input type="hidden" asp-for="Hashtags" id="HashtagsInput" />
                 </div>
 
-                <h5 class="fw-bold mt-4 mb-3 border-bottom pb-2">Hình ảnh & Mô tả</h5>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Ảnh phòng <span class="text-danger">*</span></label>
-                    <input type="file" id="imageInput" name="images" multiple accept="image/*" class="form-control focus-teal" required />
-                    <div class="form-text text-info"><i class="bi bi-info-circle"></i> Có thể chọn nhiều ảnh cùng lúc. Ảnh đầu tiên sẽ làm ảnh bìa.</div>
+                <h5 class="fw-bold mt-4 mb-3 border-bottom pb-2">Chụp ảnh phòng thực tế</h5>
+                <div class="mb-3 text-center p-4 bg-light rounded-4 border border-dashed">
+                    <button type="button" class="btn btn-teal rounded-pill px-4 fw-bold" onclick="openCamera()">
+                        <i class="bi bi-camera-fill me-2"></i> Mở Camera chụp ảnh
+                    </button>
+                    <div id="photoGallery" class="d-flex flex-wrap gap-2 justify-content-center mt-3"></div>
                 </div>
-
-                <div id="preview" class="row mt-3 mb-3"></div>
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Mô tả chi tiết <span class="text-danger">*</span></label>
-                    <textarea asp-for="Description" class="form-control focus-teal" rows="5" placeholder="Điện nước tính sao, gần các trường ĐH nào, quy định ra sao..." required></textarea>
+                    <textarea asp-for="Description" class="form-control focus-teal" rows="5" required></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-teal w-100 py-3 fw-bold fs-5 rounded-pill">ĐĂNG PHÒNG LÊN HỆ THỐNG</button>
+                <button type="submit" id="btnSubmitForm" class="btn btn-teal w-100 py-3 fw-bold fs-5 rounded-pill">
+                    ĐĂNG PHÒNG & XÁC THỰC VỊ TRÍ
+                </button>
             </form>
         </div>
     </div>
 </div>
 
-<style>
-    .btn-teal {
-        background-color: var(--primary-teal);
-        color: white;
-        border: none;
-    }
+<div class="modal fade" id="cameraModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-teal"><i class="bi bi-camera-video text-danger"></i> Chụp ảnh phòng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="stopCamera()"></button>
+            </div>
+            <div class="modal-body text-center">
+                <video id="cameraStream" autoplay playsinline></video>
+                <canvas id="captureCanvas" style="display:none;"></canvas>
+                <button type="button" class="btn btn-danger rounded-pill px-4 py-2 mt-3 fw-bold shadow-sm" onclick="capturePhoto()">
+                    <i class="bi bi-record-circle"></i> CHỤP NGAY
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        .btn-teal:hover {
-            background-color: var(--primary-teal-hover);
-            color: white;
+@section Scripts {
+    <script>
+        let stream;
+        const capturedImages = [];
+        
+        // 1. MỞ CAMERA
+        async function openCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                document.getElementById('cameraStream').srcObject = stream;
+                new bootstrap.Modal(document.getElementById('cameraModal')).show();
+            } catch (err) {
+                alert("Không thể mở Camera! Vui lòng cấp quyền sử dụng máy ảnh trong trình duyệt.");
+            }
         }
 
-    .focus-teal:focus {
-        border-color: var(--primary-teal);
-        box-shadow: 0 0 0 0.25rem rgba(0, 150, 136, 0.25);
-    }
+        // 2. CHỤP ẢNH VÀ LƯU THÀNH BASE64
+        function capturePhoto() {
+            const video = document.getElementById('cameraStream');
+            const canvas = document.getElementById('captureCanvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const base64Data = canvas.toDataURL('image/jpeg', 0.8);
+            capturedImages.push(base64Data);
 
-    .text-teal {
-        color: var(--primary-teal);
-    }
-    /* Nút hashtag khi được chọn */
-    .btn-check:checked + .btn-outline-secondary {
-        background-color: var(--primary-teal);
-        color: white;
-        border-color: var(--primary-teal);
-    }
-</style>
+            const img = document.createElement("img");
+            img.src = base64Data;
+            img.className = "photo-preview shadow-sm";
+            document.getElementById('photoGallery').appendChild(img);
 
-<script>
-    // Xử lý Preview ảnh
-    const input = document.getElementById("imageInput");
-    const preview = document.getElementById("preview");
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "base64Images";
+            input.value = base64Data;
+            document.getElementById('hiddenImagesContainer').appendChild(input);
 
-    input.addEventListener("change", function (event) {
-        preview.innerHTML = "";
-        const files = Array.from(event.target.files);
+            alert("Đã chụp thành công! Bạn có thể chụp tiếp góc khác hoặc tắt Camera.");
+        }
 
-        files.forEach(file => {
-            if (!file.type.startsWith("image/")) return;
+        function stopCamera() {
+            if (stream) stream.getTracks().forEach(track => track.stop());
+        }
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const col = document.createElement("div");
-                col.className = "col-4 col-md-3 mb-3";
-                col.innerHTML = `
-                    <div class="border rounded p-1 position-relative shadow-sm">
-                        <img src="${e.target.result}" class="img-fluid rounded" style="height:100px; width:100%; object-fit:cover;" alt="preview">
-                    </div>
-                `;
-                preview.appendChild(col);
-            };
-            reader.readAsDataURL(file);
+        // 3. HÀM TÍNH KHOẢNG CÁCH (Công thức Haversine)
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; 
+            const p1 = lat1 * Math.PI/180;
+            const p2 = lat2 * Math.PI/180;
+            const dp = (lat2-lat1) * Math.PI/180;
+            const dl = (lon2-lon1) * Math.PI/180;
+
+            const a = Math.sin(dp/2) * Math.sin(dp/2) +
+                      Math.cos(p1) * Math.cos(p2) *
+                      Math.sin(dl/2) * Math.sin(dl/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; 
+        }
+
+        // ĐÃ FIX: Dùng @@ thay vì để Razor không biên dịch nhầm thành C#
+        function extractCoords(url) {
+            let match = url.match(/@@(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+            
+            match = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+            if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+            
+            return null;
+        }
+
+        // 4. KIỂM TRA TRƯỚC KHI ĐĂNG
+        document.getElementById('createRoomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const checkedBoxes = document.querySelectorAll('.hashtag-check:checked');
+            document.getElementById('HashtagsInput').value = Array.from(checkedBoxes).map(cb => cb.value).join(',');
+
+            if (capturedImages.length === 0) {
+                alert("Vui lòng mở Camera và chụp ít nhất 1 bức ảnh thực tế của căn phòng!");
+                return;
+            }
+
+            const mapLink = document.getElementById('MapLink').value;
+            const targetCoords = extractCoords(mapLink);
+            if (!targetCoords) {
+                // ĐÃ FIX: Dùng @@
+                alert("Link Google Maps không hợp lệ! Vui lòng copy link có chứa tọa độ (ví dụ có đoạn @@10.8xx,106.xxx).");
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btnSubmitForm');
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang định vị GPS...';
+            btnSubmit.disabled = true;
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const currentLat = position.coords.latitude;
+                    const currentLng = position.coords.longitude;
+
+                    const distance = getDistance(currentLat, currentLng, targetCoords.lat, targetCoords.lng);
+
+                    if (distance > 500) {
+                        alert(`❌ PHÁT HIỆN GIAN LẬN: Bạn đang ở cách phòng trọ ${(distance/1000).toFixed(1)} km. Bạn BẮT BUỘC phải đứng tại phòng để chụp ảnh!`);
+                        btnSubmit.innerHTML = 'ĐĂNG PHÒNG & XÁC THỰC VỊ TRÍ';
+                        btnSubmit.disabled = false;
+                    } else {
+                        alert(`✅ Xác thực thành công! Khớp vị trí (sai số ${distance.toFixed(0)}m). Bắt đầu tải ảnh lên...`);
+                        HTMLFormElement.prototype.submit.call(document.getElementById('createRoomForm'));
+                    }
+
+                }, function(error) {
+                    alert("Bạn phải cho phép trình duyệt truy cập Vị trí (Location) để xác thực phòng!");
+                    btnSubmit.innerHTML = 'ĐĂNG PHÒNG & XÁC THỰC VỊ TRÍ';
+                    btnSubmit.disabled = false;
+                }, { enableHighAccuracy: true });
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ định vị GPS.");
+                btnSubmit.disabled = false;
+            }
         });
-    });
-
-    // Xử lý gom các Hashtag được chọn vào input ẩn trước khi Submit
-    document.getElementById('createRoomForm').addEventListener('submit', function() {
-        const checkedBoxes = document.querySelectorAll('.hashtag-check:checked');
-        const tags = Array.from(checkedBoxes).map(cb => cb.value);
-        document.getElementById('HashtagsInput').value = tags.join(','); // Ví dụ: "#Quan1,#CoMayLanh,#2Nguoi"
-    });
-</script>
+    </script>
+}

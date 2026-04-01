@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebDoAn.Data;
 using WebDoAn.Models;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
@@ -35,7 +34,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
+builder.Services.AddScoped<WebDoAn.Services.EmailService>();
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

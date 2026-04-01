@@ -107,44 +107,107 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 20px;">
-                <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
-                    <h5 class="fw-bold text-teal m-0"><i class="bi bi-person-plus-fill me-2"></i>Thêm khách thuê thủ công</h5>
+        <div class="col-lg-6">
+            <div class="sticky-top" style="top: 20px;">
+
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                        <h5 class="fw-bold text-teal m-0"><i class="bi bi-person-plus-fill me-2"></i>Thêm khách thuê thủ công</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" asp-action="AddTenant" enctype="multipart/form-data">
+                            <input type="hidden" name="roomPostId" value="@Model.Room?.Id" />
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-semibold small">Họ và tên</label>
+                                <input name="name" class="form-control focus-teal" placeholder="Nhập họ tên người thuê..." required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-semibold small">Email (Đã đăng ký tài khoản)</label>
+                                <input name="email" type="email" class="form-control focus-teal" placeholder="name@example.com" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-semibold small">Số điện thoại</label>
+                                <input name="phone" class="form-control focus-teal" placeholder="09xxxx..." required />
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-semibold small">Avatar (Tùy chọn)</label>
+                                <input name="avatar" type="file" class="form-control focus-teal" accept="image/*" />
+                            </div>
+
+                            <button type="submit" class="btn btn-teal w-100 rounded-pill py-2 fw-bold shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> Thêm vào phòng
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <form method="post" asp-action="AddTenant" enctype="multipart/form-data">
-                        <input type="hidden" name="roomPostId" value="@Model.Room?.Id" />
 
-                        <div class="mb-3">
-                            <label class="form-label text-muted fw-semibold small">Họ và tên</label>
-                            <input name="name" class="form-control focus-teal" placeholder="Nhập họ tên người thuê..." required />
-                        </div>
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                        <h5 class="fw-bold text-teal m-0"><i class="bi bi-file-earmark-text-fill me-2"></i>Tạo & Gửi Hợp Đồng Mới</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-controller="Contract" asp-action="SendContractToTenant" method="post">
+                            <input type="hidden" name="roomId" value="@Model.Room?.Id" />
 
-                        <div class="mb-3">
-                            <label class="form-label text-muted fw-semibold small">Email (Đã đăng ký tài khoản)</label>
-                            <input name="email" type="email" class="form-control focus-teal" placeholder="name@example.com" required />
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-semibold small">Email người nhận hợp đồng</label>
+                                <input type="email" name="tenantEmail" class="form-control focus-teal" placeholder="nguoithue@gmail.com" required />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-muted fw-semibold small">Số điện thoại</label>
-                            <input name="phone" class="form-control focus-teal" placeholder="09xxxx..." required />
-                        </div>
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-semibold small">Trình soạn thảo Hợp đồng (Như Microsoft Word)</label>
+                                <textarea id="contractEditor" name="contractContent" class="form-control">
+                                <div style="text-align: center;">
+                                <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br>
+                                <em>Độc lập - Tự do - Hạnh phúc</em><br>
+                                        ----------------------------------
+                                <h3>HỢP ĐỒNG THUÊ PHÒNG TRỌ</h3>
+                                    </div>
+                                <p><strong>BÊN A (BÊN CHO THUÊ):</strong></p>
+                                <ul>
+                                <li>Đại diện/Chủ phòng: ....................................................</li>
+                                <li>Số điện thoại: .........................................................</li>
+                                    </ul>
+                                <p><strong>BÊN B (BÊN THUÊ):</strong></p>
+                                <ul>
+                                <li><em>(Hệ thống sẽ tự động cập nhật thông tin định danh dựa trên dữ liệu eKYC CCCD của người thuê khi ký kết).</em></li>
+                                    </ul>
+                                <p>Hai bên thống nhất ký kết hợp đồng thuê phòng với các điều khoản sau:</p>
+                                <p><strong>ĐIỀU 1: THÔNG TIN PHÒNG THUÊ VÀ GIÁ CẢ</strong></p>
+                                <ul>
+                                <li>Tên phòng: <strong>@(Model.Room?.Title)</strong></li>
+                                <li>Giá thuê: <strong>@String.Format("{0:N0}", Model.Room?.Price) VNĐ/tháng</strong>.</li>
+                                <li>Tiền đặt cọc: ...................................................... VNĐ.</li>
+                                    </ul>
+                                <p><strong>ĐIỀU 2: CHI PHÍ DỊCH VỤ KHÁC</strong></p>
+                                <ul>
+                                <li>Tiền điện: ................. VNĐ/kwh.</li>
+                                <li>Tiền nước: ................. VNĐ/người/tháng (hoặc VNĐ/m3).</li>
+                                <li>Chi phí khác (Wifi/Rác/Xe): ............................................</li>
+                                    </ul>
+                                <p><strong>ĐIỀU 3: THỜI HẠN VÀ THANH TOÁN</strong></p>
+                                <ul>
+                                <li>Hợp đồng có giá trị từ ngày ....../....../20... đến ngày ....../....../20...</li>
+                                <li>Tiền phòng được thanh toán vào ngày .......... hằng tháng.</li>
+                                    </ul>
+                                </textarea>
+                            </div>
 
-                        <div class="mb-4">
-                            <label class="form-label text-muted fw-semibold small">Avatar (Tùy chọn)</label>
-                            <input name="avatar" type="file" class="form-control focus-teal" accept="image/*" />
-                        </div>
-
-                        <button type="submit" class="btn btn-teal w-100 rounded-pill py-2 fw-bold shadow-sm">
-                            <i class="bi bi-check2-circle me-1"></i> Thêm vào phòng
-                        </button>
-                    </form>
+                            <button type="submit" class="btn btn-teal w-100 rounded-pill py-2 fw-bold shadow-sm">
+                                <i class="bi bi-envelope-paper-fill me-1"></i> Gửi hợp đồng qua Email
+                            </button>
+                        </form>
+                    </div>
                 </div>
+
             </div>
         </div>
 
-        <div class="col-lg-7">
+        <div class="col-lg-6">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold m-0"><i class="bi bi-people-fill text-teal me-2"></i>Danh sách người đang thuê</h5>
                 <span class="badge bg-light text-teal border rounded-pill px-3 py-2">
@@ -164,7 +227,7 @@
             }
             else
             {
-                <div class="row row-cols-1 row-cols-md-2 g-3">
+                <div class="row row-cols-1 g-3">
                     @foreach (var tenant in Model.Tenants)
                     {
                         <div class="col">
@@ -202,14 +265,31 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+
     <script>
+        // Kích hoạt Trình soạn thảo Word cho thẻ textarea
+        tinymce.init({
+            selector: '#contractEditor',
+            height: 500,
+            menubar: false,
+            plugins: 'lists link table',
+            toolbar: 'bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table',
+            content_style: 'body { font-family:Arial,sans-serif; font-size:15px }',
+            promotion: false, // Tắt hoàn toàn quảng cáo nâng cấp
+            branding: false   // Ẩn luôn chữ "Powered by Tiny" cho chuyên nghiệp
+        });
+
+        // =========================================================
+        // PHẦN CODE XỬ LÝ NÚT COPY VÀ TẠO MÃ BÊN DƯỚI GIỮ NGUYÊN
+        // =========================================================
+
         // Xử lý tạo mã mới (Ajax)
         document.getElementById("btnGenerateCode")?.addEventListener("click", async function () {
             const roomId = this.getAttribute("data-room-id");
             const btn = this;
             const originalHtml = btn.innerHTML;
 
-            // Hiệu ứng đang tải
             btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tạo...';
             btn.disabled = true;
 
@@ -243,12 +323,9 @@
             try {
                 await navigator.clipboard.writeText(code);
                 const icon = document.getElementById("copyIcon");
-                const btn = this;
 
-                // Đổi thành icon Check màu xanh
                 icon.className = "bi bi-check-lg text-success fs-5";
 
-                // Trả lại icon cũ sau 2 giây
                 setTimeout(() => {
                     icon.className = "bi bi-clipboard";
                 }, 2000);
@@ -257,4 +334,5 @@
             }
         });
     </script>
+}
 }

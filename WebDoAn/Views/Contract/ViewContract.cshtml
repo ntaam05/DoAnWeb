@@ -1,0 +1,18 @@
+﻿@model WebDoAn.Models.RoomContract
+<div class="container py-5">
+    <div class="card shadow p-5">
+        <div class="d-print-none text-end mb-4">
+            <button onclick="window.print()" class="btn btn-teal"><i class="bi bi-printer"></i> IN / LƯU PDF</button>
+        </div>
+        <div id="contractContent">
+            @Html.Raw(Model.ContractContent)
+        </div>
+    </div>
+</div>
+<style>
+    @@media print {
+        .d-print-none {
+            display: none !important;
+        }
+    }
+</style>

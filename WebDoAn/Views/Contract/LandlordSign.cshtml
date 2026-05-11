@@ -1,0 +1,90 @@
+﻿@model WebDoAn.Models.RoomContract
+@{
+    ViewData["Title"] = "Chủ trọ ký xác nhận";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-warning text-dark text-center py-3 rounded-top-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-pen-fill"></i> CHỦ TRỌ KÝ XÁC NHẬN</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <div class="alert alert-success small">
+                        <strong>Thông báo:</strong> Người thuê (Bên B) đã hoàn tất ký điện tử. Vui lòng kiểm tra lại nội dung và Ký xác nhận (Bên A) để hợp đồng chính thức có hiệu lực.
+                    </div>
+
+                    <div class="border p-3 mb-4 bg-light" style="max-height: 300px; overflow-y: auto;">
+                        @Html.Raw(Model.ContractContent)
+                    </div>
+
+                    <form asp-action="ConfirmLandlordSign" method="post" id="signForm">
+                        <input type="hidden" name="contractId" value="@Model.Id" />
+                        <input type="hidden" name="signatureBase64" id="signatureBase64" required />
+
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold">1. Chữ ký của Chủ phòng:</label>
+                            <div class="border rounded bg-light" style="touch-action: none;">
+                                <canvas id="signatureCanvas" width="600" height="250" class="bg-white" style="cursor: crosshair; border: 1px dashed #ffc107;"></canvas>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="signaturePad.clear()">Ký lại</button>
+                        </div>
+
+                        <div class="mb-4 text-center p-3 border rounded bg-light">
+                            <label class="form-label fw-bold">2. Xác thực OTP Chủ Trọ</label>
+                            <button type="button" id="btnSendOTP" class="btn btn-warning fw-bold mb-3 w-100">GỬI MÃ OTP VỀ EMAIL CỦA TÔI</button>
+                            <div id="otpInputArea" class="d-none mt-3">
+                                <input type="text" name="otpInput" class="form-control form-control-lg text-center mx-auto" style="max-width: 200px; letter-spacing: 5px; font-weight: bold;" placeholder="------" required maxlength="6" />
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnSubmitSign" class="btn btn-success w-100 py-3 fw-bold fs-5 d-none">
+                            HOÀN TẤT HỢP ĐỒNG
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+    <script>
+        const canvas = document.getElementById('signatureCanvas');
+        const signaturePad = new SignaturePad(canvas, { penColor: "red" }); // Chủ nhà ký mực đỏ cho phân biệt
+
+        document.getElementById('btnSendOTP').addEventListener('click', async function() {
+            if (signaturePad.isEmpty()) { alert("Vui lòng ký tên!"); return; }
+            document.getElementById('signatureBase64').value = signaturePad.toDataURL('image/png');
+
+            const btn = this;
+            btn.innerHTML = 'Đang gửi mail...'; btn.disabled = true;
+
+            try {
+                const response = await fetch('/Contract/GenerateLandlordOTP', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'contractId=@Model.Id'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    btn.innerHTML = 'Đã gửi OTP'; btn.classList.replace('btn-warning', 'btn-success');
+                    document.getElementById('otpInputArea').classList.remove('d-none');
+                    document.getElementById('btnSubmitSign').classList.remove('d-none');
+                }
+            } catch(e) { alert("Lỗi mạng!"); btn.innerHTML = 'Thử lại'; btn.disabled = false; }
+        });
+
+        document.getElementById('signForm').addEventListener('submit', function(e) {
+            if (signaturePad.isEmpty()) { e.preventDefault(); alert("Vui lòng ký tên!"); }
+        });
+    </script>
+}

@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Xác thực danh tính (eKYC)";
+}
+
+<div class="container py-5">
+    <h2 class="text-center text-teal fw-bold mb-4">XÁC THỰC DANH TÍNH (eKYC)</h2>
+    <p class="text-center text-muted">Vui lòng cung cấp hình ảnh CCCD và chụp ảnh khuôn mặt để làm cơ sở pháp lý cho Hợp đồng.</p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-controller="Contract" asp-action="Save_eKYC" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+                <input type="hidden" name="contractId" value="@ViewBag.ContractId" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">1. Tải ảnh mặt TRƯỚC CCCD *</label>
+                    <input type="file" name="frontIdCard" class="form-control" accept="image/*" required />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">2. Tải ảnh mặt SAU CCCD *</label>
+                    <input type="file" name="backIdCard" class="form-control" accept="image/*" required />
+                </div>
+
+                <div class="mb-4 text-center">
+                    <label class="form-label fw-bold d-block text-start">3. Quét khuôn mặt trực tiếp *</label>
+
+                    <video id="webcam" width="100%" style="max-height: 300px; background: #000; border-radius: 10px;" autoplay playsinline></video>
+
+                    <button type="button" id="captureBtn" class="btn btn-outline-teal mt-2 w-100 fw-bold">
+                        📸 CHỤP ẢNH XÁC THỰC
+                    </button>
+
+                    <canvas id="canvas" class="d-none"></canvas>
+                    <img id="photoPreview" class="mt-3 img-fluid rounded d-none" style="border: 2px solid #009688;" />
+
+                    <input type="hidden" id="faceImageData" name="faceImageData" required />
+                </div>
+
+                <button type="submit" class="btn btn-teal w-100 py-3 fw-bold fs-5">TIẾP TỤC BƯỚC KÝ TÊN ➡️</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let video = document.getElementById('webcam');
+
+    // Bật Webcam và ÉP video phải chạy
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(err => {
+            alert("Vui lòng cấp quyền truy cập Camera để thực hiện eKYC!");
+            console.error(err);
+        });
+
+    // Xử lý sự kiện bấm nút Chụp ảnh
+    document.getElementById('captureBtn').onclick = function() {
+        let canvas = document.getElementById('canvas');
+        let preview = document.getElementById('photoPreview');
+
+        // Lấy kích thước thật của video, nếu mạng chậm/lỗi thì lấy mặc định là 640x480
+        let width = video.videoWidth || 640;
+        let height = video.videoHeight || 480;
+
+        // Vẽ hình từ video ra canvas với kích thước chuẩn
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+
+        // Chuyển canvas thành dạng ảnh Base64
+        let imageData = canvas.toDataURL('image/jpeg');
+
+        // Hiển thị ảnh vừa chụp lên màn hình và gán vào input ẩn
+        preview.src = imageData;
+        preview.classList.remove('d-none');
+        document.getElementById('faceImageData').value = imageData;
+
+        // Hiệu ứng chớp tắt để biết đã chụp
+        document.body.style.opacity = 0.8;
+        setTimeout(() => document.body.style.opacity = 1, 150);
+    };
+</script>

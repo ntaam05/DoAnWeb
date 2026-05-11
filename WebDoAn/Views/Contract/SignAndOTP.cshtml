@@ -1,0 +1,121 @@
+﻿@model WebDoAn.Models.RoomContract
+@{
+    ViewData["Title"] = "Ký tên điện tử";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-teal text-white text-center py-3 rounded-top-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-pen-fill"></i> KÝ HỢP ĐỒNG ĐIỆN TỬ</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <div class="alert alert-info small">
+                        <strong><i class="bi bi-shield-check"></i> Lưu ý pháp lý:</strong> Chữ ký điện tử của bạn sẽ được xác thực bằng mã OTP và gắn liền với dữ liệu eKYC khuôn mặt bạn vừa cung cấp. Hành động này có giá trị tương đương chữ ký tay.
+                    </div>
+
+                    <form asp-action="ConfirmSignContract" method="post" id="signForm">
+                        <input type="hidden" name="contractId" value="@Model.Id" />
+                        <input type="hidden" name="signatureBase64" id="signatureBase64" required />
+
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold">1. Vui lòng ký tên của bạn vào khung dưới đây:</label>
+                            <div class="border rounded bg-light" style="touch-action: none;">
+                                <canvas id="signatureCanvas" width="600" height="250" class="bg-white" style="cursor: crosshair; border: 1px dashed #009688;"></canvas>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="signaturePad.clear()">
+                                <i class="bi bi-eraser"></i> Ký lại
+                            </button>
+                        </div>
+
+                        <div class="mb-4 text-center p-3 border rounded bg-light">
+                            <label class="form-label fw-bold">2. Xác thực OTP</label>
+                            <p class="text-muted small">Bấm nút bên dưới để nhận mã OTP gửi về Email: <strong>@Model.TenantEmail</strong></p>
+
+                            <button type="button" id="btnSendOTP" class="btn btn-warning fw-bold mb-3">
+                                <i class="bi bi-send"></i> GỬI MÃ OTP CHO TÔI
+                            </button>
+
+                            <div id="otpInputArea" class="d-none mt-3">
+                                <input type="text" name="otpInput" class="form-control form-control-lg text-center mx-auto" style="max-width: 200px; letter-spacing: 5px; font-weight: bold;" placeholder="------" required maxlength="6" />
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnSubmitSign" class="btn btn-teal w-100 py-3 fw-bold fs-5 d-none">
+                            XÁC NHẬN KÝ & HOÀN TẤT HỢP ĐỒNG
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+
+    <script>
+        const canvas = document.getElementById('signatureCanvas');
+        const signaturePad = new SignaturePad(canvas, {
+            penColor: "blue" // Màu mực xanh cho giống thật
+        });
+
+        // Xử lý gửi OTP
+        document.getElementById('btnSendOTP').addEventListener('click', async function() {
+            if (signaturePad.isEmpty()) {
+                alert("Bạn phải ký tên trước khi nhận mã OTP!");
+                return;
+            }
+
+            document.getElementById('signatureBase64').value = signaturePad.toDataURL('image/png');
+
+            const btn = this;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi mail...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/Contract/GenerateAndSendOTP', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'contractId=@Model.Id'
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    btn.innerHTML = '<i class="bi bi-check-circle"></i> Đã gửi OTP thành công';
+                    btn.classList.replace('btn-warning', 'btn-success');
+
+                    // Hiện ô nhập OTP và nút Submit
+                    document.getElementById('otpInputArea').classList.remove('d-none');
+                    document.getElementById('btnSubmitSign').classList.remove('d-none');
+                } else {
+                    alert(data.message);
+                    btn.innerHTML = 'Thử lại';
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                alert("Lỗi kết nối mạng!");
+                btn.innerHTML = 'Thử lại';
+                btn.disabled = false;
+            }
+        });
+
+        // Chặn submit nếu chưa ký & cập nhật ảnh lần cuối
+        document.getElementById('signForm').addEventListener('submit', function(e) {
+            if (signaturePad.isEmpty()) {
+                e.preventDefault();
+                alert("Vui lòng ký tên!");
+            } else {
+                document.getElementById('signatureBase64').value = signaturePad.toDataURL('image/png');
+            }
+        });
+    </script>
+}
